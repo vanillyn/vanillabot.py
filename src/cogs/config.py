@@ -3,6 +3,7 @@ from discord.ext import commands
 from src.utils import config as cfg
 from src.utils.localization import localization
 
+
 class Config(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -21,18 +22,37 @@ class Config(commands.Cog):
             if ctx.message.channel_mentions:
                 channel = ctx.message.channel_mentions[0]
                 await cfg.set_log_channel(ctx.guild.id, channel.id)
-                await ctx.send(localization.get("config.log_channel.set", lang=lang, channel=channel.mention))
+                await ctx.send(
+                    localization.get(
+                        "config.log_channel.set", lang=lang, channel=channel.mention
+                    )
+                )
             else:
-                await ctx.send(localization.get("config.log_channel.invalid", lang=lang))
+                await ctx.send(
+                    localization.get("config.log_channel.invalid", lang=lang)
+                )
 
         elif option == "log_language":
             if value in localization.languages:
                 await cfg.set_language(ctx.guild.id, value)
-                await ctx.send(localization.get("config.log_language.set", lang=value, lang_name=value))
+                await ctx.send(
+                    localization.get(
+                        "config.log_language.set", lang=value, lang_name=value
+                    )
+                )
             else:
-                await ctx.send(localization.get("error.invalid_language", lang=lang, available=", ".join(localization.languages.keys())))
+                await ctx.send(
+                    localization.get(
+                        "error.invalid_language",
+                        lang=lang,
+                        available=", ".join(localization.languages.keys()),
+                    )
+                )
         else:
-            await ctx.send(localization.get("config.unknown_option", lang=lang, option=option))
+            await ctx.send(
+                localization.get("config.unknown_option", lang=lang, option=option)
+            )
+
 
 async def setup(bot):
     await bot.add_cog(Config(bot))
