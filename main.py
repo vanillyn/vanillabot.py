@@ -16,13 +16,22 @@ intents.members = True
 prefix = os.getenv("PREFIX", ";")
 bot = commands.Bot(command_prefix=prefix, intents=intents)
 
+
 @bot.event
 async def on_ready():
     print(f"{os.getenv('NAME', 'bot')} loaded. {bot.user}")
-    for filename in os.listdir("./src/cmds"):
-        if filename.endswith(".py") and not filename.startswith("__"):
-            await bot.load_extension(f"src.cmds.{filename[:-3]}")
-    print("all berries loaded.")
+
+
+@bot.event
+async def setup_hook():
+    for cog in os.listdir("./src/cogs"):
+        if cog.endswith(".py"):
+            try:
+                await bot.load_extension(f"src.cmds.{cog}")
+                print(f"Loaded {cog}")
+            except Exception as e:
+                print(f"Failed to load {cog}:", e)
+
 
 token = os.getenv("BOT_TOKEN")
 bot.run(token)

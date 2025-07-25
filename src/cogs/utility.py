@@ -5,6 +5,7 @@ from time import perf_counter
 from src.utils.localization import localization
 from src.utils.config import get_config_value
 
+
 class Ping(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -33,11 +34,13 @@ class Ping(commands.Cog):
             await channel.send(response)
 
             if debug:
-                debug_msg = "\n".join([
-                    f"response time: {response_time}ms",
-                    f"used lang: {lang}",
-                    f"loaded langs: {', '.join(langs)}"
-                ])
+                debug_msg = "\n".join(
+                    [
+                        f"response time: {response_time}ms",
+                        f"used lang: {lang}",
+                        f"loaded langs: {', '.join(langs)}",
+                    ]
+                )
                 await channel.send(debug_msg)
 
 
