@@ -1,0 +1,56 @@
+{
+    "ban": {
+        "success": "{user} ({user_id}) has been banned{for_duration}. Reason: {reason}",
+        "failure": "Failed to ban user {user}.",
+        "already_banned": "User {user} is already banned.",
+        "no_permission": "You do not have permission to ban users.",
+        "message_failed": "Failed to send ban message to {user}.",
+        "message": "You have been banned from the server{for_duration}. Reason: {reason}"
+    },
+    "unban": {
+        "success": "{user} ({user_id}) has been unbanned. Reason: {reason}",
+        "failure": "Failed to unban user {user}.",
+        "not_banned": "User {user} is not banned.",
+        "no_permission": "You do not have permission to unban users."
+    }, 
+    "kick": {
+        "success": "{user} ({user_id}) has been kicked from the server. Reason: {reason}",
+        "failure": "Failed to kick user {user}.",
+        "no_permission": "You do not have permission to kick users.",
+        "message_failed": "Failed to send kick message to {user}.",
+        "message": "You have been kicked from the server. Reason: {reason}"
+    }, 
+    "warn": {
+        "success": "{user} has been warned. Reason: {reason}",
+        "failure": "Failed to warn user {user}.",
+        "no_permission": "You do not have permission to warn users.",
+        "message_failed": "Failed to send warning message to {user}.",
+        "message": "You have been warned. Reason: {reason}"
+    }, 
+    "note": {
+        "success_local": "Note added to {user}'s profile for this server: {note}",
+        "success_global": "Note added to {user}'s profile: {note}",
+        "failure_local": "Failed to add note to {user}'s profile for this server.",
+        "failure_global": "Failed to add global note to {user}'s profile.",
+        "no_permission": "You do not have permission to add notes.", 
+        "no_global_permission": "To add global notes, you need to authenticate."
+    },
+    "timeout": {
+        "success": "{user} ({user_id}) has been put in timeout for {duration}. Reason: {reason}",
+        "failure": "Failed to put user {user} in timeout.",
+        "no_permission": "You do not have permission to put users in timeout.",
+        "message_failed": "Failed to send timeout message to {user}.",
+        "message": "You have been put in timeout for {duration}. Reason: {reason}"
+    },
+    "info": {
+        "success": {
+            "name:": "{user_name}",
+            "id": "{user_id}",
+            "join_date": "Joined: {join_date}",
+            "creation_date": "Account Created: {creation_date}",
+            "top_role": "Role: {top_role}",
+            "infractions": "Infractions: {infractions}"
+        },
+        "failure": "Failed to retrieve information for user {user}."
+    }
+}

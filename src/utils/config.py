@@ -1,33 +1,61 @@
+import sqlite3
 import os
-import json
 
-config_file = "config.json"
+DB_PATH = "config.db"
 
-if not os.path.exists(config_file):
-    with open(config_file, "w") as f:
-        json.dump({}, f)
+def init_config():
+    """makes the configuration database"""
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS guild (
+                guild_id TEXT PRIMARY KEY,
+                language TEXT DEFAULT 'en',
+                prefix TEXT DEFAULT 'y;'
+            )
+        """)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS user (
+                user_id TEXT PRIMARY KEY,
+                language TEXT DEFAULT 'en'
+            )
+        """)
+        conn.commit()
 
+def set_guild_config(guild_id, key, value):
+    """set a configuration value for a guild"""
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute(f"""
+            INSERT INTO guild (guild_id, {key})
+            VALUES (?, ?)
+            ON CONFLICT(guild_id) DO UPDATE SET {key} = excluded.{key}
+        """, (str(guild_id), value))
+        conn.commit()
 
-def load_config():
-    with open(config_file, "r") as f:
-        return json.load(f)
+def get_guild_config(guild_id, key):
+    """get a configuration value for a guild"""
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute(f"SELECT {key} FROM guild WHERE guild_id = ?", (str(guild_id),))
+        row = c.fetchone()
+        return row[0] if row else "en"
 
+def set_user_config(user_id, key, value):
+    """set a configuration value for a user"""
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute(f"""
+            INSERT INTO user (user_id, {key})
+            VALUES (?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET {key} = excluded.{key}
+        """, (str(user_id), value))
+        conn.commit()
 
-def save_config(data):
-    with open(config_file, "w") as f:
-        json.dump(data, f, indent=2)
-
-
-def get_config_value(guild_id, key):
-    data = load_config()
-    guild_id = str(guild_id)
-    return data.get(guild_id, {}).get(key)
-
-
-def set_config_value(guild_id, key, value):
-    data = load_config()
-    guild_id = str(guild_id)
-    if guild_id not in data:
-        data[guild_id] = {}
-    data[guild_id][key] = value
-    save_config(data)
+def get_user_config(user_id, key):
+    """get a configuration value for a user"""
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute(f"SELECT {key} FROM user WHERE user_id = ?", (str(user_id),))
+        row = c.fetchone()
+        return row[0] if row else "en"

@@ -1,28 +1,33 @@
-import json
 import os
-
+import json
+from collections import defaultdict
 
 class Localization:
     def __init__(self, default_lang="en"):
         self.default_lang = default_lang
-        self.languages = {}
+        self.languages = defaultdict(dict)
         self.load_languages()
 
     def load_languages(self):
+        """load all language files"""
         locales_dir = "locales"
-        for filename in os.listdir(locales_dir):
-            if filename.endswith(".json"):
-                lang_code = filename[:-5]
-                with open(
-                    os.path.join(locales_dir, filename), "r", encoding="utf-8"
-                ) as f:
-                    self.languages[lang_code] = json.load(f)
+        for lang in os.listdir(locales_dir):
+            lang_path = os.path.join(locales_dir, lang)
+            if os.path.isdir(lang_path):
+                for file in os.listdir(lang_path):
+                    if file.endswith(".json"):
+                        key = file[:-5]
+                        with open(os.path.join(lang_path, file), encoding="utf-8") as f:
+                            self.languages[lang][key] = json.load(f)
 
-    def get(self, key, lang=None, **kwargs):
+    def get(self, section, key, lang=None, fallback=True, **kwargs):
+        """get a localized string"""
         lang = lang or self.default_lang
-        data = self.languages.get(lang, {})
-        text = data.get(key, self.languages.get(self.default_lang, {}).get(key, key))
-        return text.format(**kwargs)
-
+        entry = self.languages.get(lang, {}).get(section, {}).get(key)
+        if not entry and fallback:
+            entry = self.languages.get(self.default_lang, {}).get(section, {}).get(key, key)
+        if isinstance(entry, str):
+            return entry.format(**kwargs)
+        return entry
 
 localization = Localization()

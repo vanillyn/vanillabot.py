@@ -1,0 +1,84 @@
+{
+	"help": {
+		"title": "Help",
+		"args": ["embed|text", "lang", "command"],
+		"description": "Displays the help message with available commands.",
+		"details": "Get details on a specific command by running `help <command>`."
+	},
+	"ping": {
+		"title": "Ping",
+		"args": ["lang"],
+		"description": "Checks the bot's latency.",
+		"details": "Returns a pong, like always."
+	},
+	"config": {
+		"title": "Configuration",
+		"args": ["key", "value"],
+		"description": "Manages the bot's configuration settings.",
+		"details": "You can set configuration values by sending `config <key> <value>`, for example, `config prefix ly:`. \nTo view all values for a certain key, run `config <key>`. Some keys can have subsets of keys, and running that will show the values of those subsets. For example, `config log` will show the values of all logging-related settings.\nFor example, to edit the logging channel for moderation actions, you can run `config log/moderation/channel <channel_id>`."
+	},
+	"ban": {
+		"title": "Ban",
+		"args": ["user", "duration", "reason"],
+		"description": "Bans a user from the server.",
+		"details": "You can set a duration, after which the user will be unbanned. The reason should be provided for clarity. Requires the 'Ban Members' permission."
+	},
+	"unban": {
+		"title": "Unban",
+		"args": ["user", "reason"],
+		"description": "Unbans a user from the server.",
+		"details": "Requires the 'Ban Members' permission."
+	},
+	"kick": {
+		"title": "Kick",
+		"args": ["user", "reason"],
+		"description": "Kicks a user from the server.",
+		"details": "Requires the 'Kick Members' permission."
+	},
+	"timeout": {
+		"title": "Timeout",
+		"args": ["user", "duration", "reason"],
+		"description": "Puts a user in timeout for a specified duration.",
+		"details": "Requires the 'Timeout Members' permission."
+	},
+	"warn": {
+		"title": "Warn",
+		"args": ["user", "reason"],
+		"description": "Issues a warning to a user.",
+		"details": "A reason is required. Requires the 'Manage Messages' permission."
+	},
+	"note": {
+		"title": "Note",
+		"args": ["user", "note", "global"],
+		"description": "Adds a note to a user's profile.",
+		"details": "Requires the 'Manage Server' permission. For global notes, you need to authenticate."
+	},
+	"wiki": {
+		"title": "Wiki",
+		"args": ["query", "lang", "embed|text", "sensitive"],
+		"description": "Searches the wiki for information.",
+		"details": "Returns an entry in the wiki. By default, sensitive information will be hidden. You can show sensitive information by adding 'sensitive' to the command."
+	},
+	"translate": {
+		"title": "Translate",
+		"args": ["text", "source_lang", "target_lang"],
+		"description": "Translates text from one language to another.",
+		"details": "The text is required to be in quotes. The languages are going to be in two letter codes, for example EN for English, or JA for Japanese."
+	},
+	"autoresponder": {
+		"title": "Auto Responder",
+		"args": ["create/delete/edit/list", "name", "trigger", "response", "lang"],
+		"description": "Manages automatic responses to specific messages.",
+		"details": "Names and triggers must be unique. The trigger and response must be in quotes, for clarity. For example: `ar create greeting \"Hello!\" \"Hi!\"`.\nYou can also specify what language the response is in. You can translate your autoresponder by using `ar edit <name> <response> <lang>`.\nAutoresponders can use placeholders and actions. For example, you can use `{user}` to mention the triggering user. You can also use `{react::emoji:}` to add a reaction to the triggering message. To get a list of available placeholders, you can run `help placeholders`"
+	},
+	"info": {
+		"title": "Info",
+		"args": ["user"],
+		"description": "Displays information about a user.",
+		"details": "If you have the 'Ban Members' permission, you can see infractions on the user, like warns, and notes."
+	},
+	"placeholders": {
+		"title": "Placeholders",
+		"details": "`{user}`: Mentions the user who triggered the command.\n`{user_name}`: The username of the user.\n`{user_id}`: The ID of the user.\n`{mention_name}`: The name of the user mentioned.\n`{mention_id}`: The ID of the user mentioned.\n`{mention_join_date}`: The join date of the mentioned user.\n`{creator_name}`: The name of the creator of the command.\n`{creator_id}`: The ID of the creator of the command.\n`{server_name}`: The name of the server.\n`{server_id}`: The ID of the server.\n`{channel}`: The channel where the command was triggered.\n`{channel_name}`: The name of the channel.\n`{react::emoji:}`: Adds a reaction to the triggering message with the specified emoji.\n`{time}`: Current time.\n`{date}`: Current date.\n`{mention}`: The user who was mentioned in the command.\n`{join_date}`: Join date of the user.\n`{top_role}`: Top role of the user.\n`{creation_date}`: Creation date of a user.\n`{server_creation_date}`: Creation date of the server.\n`{member_count}`: Count of members in the server.\n`{member_count_ordinal}`: Gets the ordinal member count.\nYou can use these placeholders in various commands to personalize messages and responses."
+	}
+}
