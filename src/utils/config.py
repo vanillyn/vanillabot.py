@@ -9,14 +9,14 @@ def init_config():
         c = conn.cursor()
         c.execute("""
             CREATE TABLE IF NOT EXISTS guild (
-                guild_id TEXT PRIMARY KEY,
+                guild_id INTEGER PRIMARY KEY,
                 language TEXT DEFAULT 'en',
                 prefix TEXT DEFAULT 'y;'
             )
         """)
         c.execute("""
             CREATE TABLE IF NOT EXISTS user (
-                user_id TEXT PRIMARY KEY,
+                user_id INTEGER PRIMARY KEY,
                 language TEXT DEFAULT 'en'
             )
         """)
@@ -39,7 +39,8 @@ def get_guild_config(guild_id, key):
         c = conn.cursor()
         c.execute(f"SELECT {key} FROM guild WHERE guild_id = ?", (str(guild_id),))
         row = c.fetchone()
-        return row[0] if row else "en"
+        print("getting guild config:", row)
+        return row[0] if row else None
 
 def set_user_config(user_id, key, value):
     """set a configuration value for a user"""
@@ -58,4 +59,4 @@ def get_user_config(user_id, key):
         c = conn.cursor()
         c.execute(f"SELECT {key} FROM user WHERE user_id = ?", (str(user_id),))
         row = c.fetchone()
-        return row[0] if row else "en"
+        return row[0] if row else None
