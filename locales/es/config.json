@@ -1,0 +1,46 @@
+{
+    "config": {
+        "title": "Configuración",
+        "description": "Administra la configuración de tu servidor con las siguientes opciones:",
+        "server": {
+            "title": "Configuración del Servidor",
+            "prefix": "`config server prefix <prefix>` - Establecer prefijo",
+            "language": "`config server language <lang>` - Establecer idioma",
+            "success": "La configuración del servidor `{key}` se actualizó a `{value}`",
+            "failure": "No se pudo actualizar la configuración del servidor `{key}`",
+            "no_permission": "No tienes permiso para administrar la configuración del servidor."
+        }, 
+        "user": {
+            "title": "Configuración de Usuario",
+            "language": "`config user language <lang>` - Establece tu idioma preferido",
+            "success": "La configuración de usuario `{key}` se actualizó a `{value}`",
+            "failure": "No se pudo actualizar la configuración de usuario `{key}`"
+        }
+    },
+    "ar": {
+        "title": "Autorespondedores",
+        "description": "Administra los autorespondedores.",
+        "failure": {
+            "no_permission": "No tienes permiso para administrar los autorespondedores.",
+            "not_found": "¡`{name}` no encontrado!",
+            "invalid_name": "Nombre de autorespondedor inválido. Debe ser alfanumérico y no se permiten espacios.",
+            "argument_missing": "Falta el argumento requerido `{arg}`.",
+            "no_autoresponders": "No se encontraron autorespondedores."
+        },
+        "create": {
+            "title": "crear",
+            "success": "`{name}` creado exitosamente.",
+            "failure": "No se pudo crear el autorespondedor `{name}`."
+        },
+        "edit": {
+            "title": "editar",
+            "success": "`{name}` editado exitosamente.",
+            "failure": "No se pudo editar el autorespondedor `{name}`."
+        },
+        "delete": {
+            "title": "eliminar",
+            "success": "`{name}` eliminado exitosamente.",
+            "failure": "No se pudo eliminar el autorespondedor `{name}`."
+        }
+    }
+}

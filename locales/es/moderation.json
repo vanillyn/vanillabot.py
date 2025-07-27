@@ -1,0 +1,56 @@
+{
+    "ban": {
+        "success": "{user} ({user_id}) ha sido baneado{for_duration}. Razón: {reason}",
+        "failure": "No se pudo banear al usuario {user}.",
+        "already_banned": "El usuario {user} ya está baneado.",
+        "no_permission": "No tienes permiso para banear usuarios.",
+        "message_failed": "No se pudo enviar el mensaje de baneo a {user}.",
+        "message": "Has sido baneado del servidor{for_duration}. Razón: {reason}"
+    },
+    "unban": {
+        "success": "{user} ({user_id}) ha sido desbaneado. Razón: {reason}",
+        "failure": "No se pudo desbanear al usuario {user}.",
+        "not_banned": "El usuario {user} no está baneado.",
+        "no_permission": "No tienes permiso para desbanear usuarios."
+    }, 
+    "kick": {
+        "success": "{user} ({user_id}) ha sido expulsado del servidor. Razón: {reason}",
+        "failure": "No se pudo expulsar al usuario {user}.",
+        "no_permission": "No tienes permiso para expulsar usuarios.",
+        "message_failed": "No se pudo enviar el mensaje de expulsión a {user}.",
+        "message": "Has sido expulsado del servidor. Razón: {reason}"
+    }, 
+    "warn": {
+        "success": "{user} ha sido advertido. Razón: {reason}",
+        "failure": "No se pudo advertir al usuario {user}.",
+        "no_permission": "No tienes permiso para advertir usuarios.",
+        "message_failed": "No se pudo enviar el mensaje de advertencia a {user}.",
+        "message": "Has sido advertido. Razón: {reason}"
+    }, 
+    "note": {
+        "success_local": "Nota agregada al perfil de {user} para este servidor: {note}",
+        "success_global": "Nota agregada al perfil de {user}: {note}",
+        "failure_local": "No se pudo agregar la nota al perfil de {user} para este servidor.",
+        "failure_global": "No se pudo agregar la nota global al perfil de {user}.",
+        "no_permission": "No tienes permiso para agregar notas.", 
+        "no_global_permission": "Para agregar notas globales, necesitas autenticarte."
+    },
+    "timeout": {
+        "success": "{user} ({user_id}) ha sido puesto en tiempo de espera por {duration}. Razón: {reason}",
+        "failure": "No se pudo poner en tiempo de espera al usuario {user}.",
+        "no_permission": "No tienes permiso para poner usuarios en tiempo de espera.",
+        "message_failed": "No se pudo enviar el mensaje de tiempo de espera a {user}.",
+        "message": "Has sido puesto en tiempo de espera por {duration}. Razón: {reason}"
+    },
+    "info": {
+        "success": {
+            "name:": "{user_name}",
+            "id": "{user_id}",
+            "join_date": "Unido: {join_date}",
+            "creation_date": "Cuenta creada: {creation_date}",
+            "top_role": "Rol: {top_role}",
+            "infractions": "Infracciones: {infractions}"
+        },
+        "failure": "No se pudo obtener la información del usuario {user}."
+    }
+}

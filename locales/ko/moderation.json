@@ -1,0 +1,56 @@
+{
+    "ban": {
+        "success": "{user} ({user_id})님이 차단되었습니다{for_duration}. 사유: {reason}",
+        "failure": "{user}님을 차단하는 데 실패했습니다.",
+        "already_banned": "{user}님은 이미 차단되어 있습니다.",
+        "no_permission": "사용자를 차단할 권한이 없습니다.",
+        "message_failed": "{user}님에게 차단 메시지를 보내는 데 실패했습니다.",
+        "message": "서버에서 차단되었습니다{for_duration}. 사유: {reason}"
+    },
+    "unban": {
+        "success": "{user} ({user_id})님의 차단이 해제되었습니다. 사유: {reason}",
+        "failure": "{user}님의 차단 해제에 실패했습니다.",
+        "not_banned": "{user}님은 차단되어 있지 않습니다.",
+        "no_permission": "사용자 차단을 해제할 권한이 없습니다."
+    }, 
+    "kick": {
+        "success": "{user} ({user_id})님이 서버에서 추방되었습니다. 사유: {reason}",
+        "failure": "{user}님을 추방하는 데 실패했습니다.",
+        "no_permission": "사용자를 추방할 권한이 없습니다.",
+        "message_failed": "{user}님에게 추방 메시지를 보내는 데 실패했습니다.",
+        "message": "서버에서 추방되었습니다. 사유: {reason}"
+    }, 
+    "warn": {
+        "success": "{user}님에게 경고를 주었습니다. 사유: {reason}",
+        "failure": "{user}님에게 경고를 주는 데 실패했습니다.",
+        "no_permission": "사용자에게 경고할 권한이 없습니다.",
+        "message_failed": "{user}님에게 경고 메시지를 보내는 데 실패했습니다.",
+        "message": "경고를 받았습니다. 사유: {reason}"
+    }, 
+    "note": {
+        "success_local": "{user}님의 프로필(이 서버)에 노트가 추가되었습니다: {note}",
+        "success_global": "{user}님의 프로필에 글로벌 노트가 추가되었습니다: {note}",
+        "failure_local": "{user}님의 프로필(이 서버)에 노트를 추가하는 데 실패했습니다.",
+        "failure_global": "{user}님의 프로필에 글로벌 노트를 추가하는 데 실패했습니다.",
+        "no_permission": "노트를 추가할 권한이 없습니다.", 
+        "no_global_permission": "글로벌 노트를 추가하려면 인증이 필요합니다."
+    },
+    "timeout": {
+        "success": "{user} ({user_id})님이 {duration} 동안 타임아웃되었습니다. 사유: {reason}",
+        "failure": "{user}님을 타임아웃하는 데 실패했습니다.",
+        "no_permission": "사용자를 타임아웃할 권한이 없습니다.",
+        "message_failed": "{user}님에게 타임아웃 메시지를 보내는 데 실패했습니다.",
+        "message": "{duration} 동안 타임아웃되었습니다. 사유: {reason}"
+    },
+    "info": {
+        "success": {
+            "name:": "{user_name}",
+            "id": "{user_id}",
+            "join_date": "가입일: {join_date}",
+            "creation_date": "계정 생성일: {creation_date}",
+            "top_role": "역할: {top_role}",
+            "infractions": "위반 기록: {infractions}"
+        },
+        "failure": "{user}님의 정보를 가져오는 데 실패했습니다."
+    }
+}

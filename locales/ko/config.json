@@ -1,0 +1,46 @@
+{
+    "config": {
+        "title": "설정",
+        "description": "다음 옵션으로 서버의 설정을 관리하세요:",
+        "server": {
+            "title": "서버 설정",
+            "prefix": "`config server prefix <prefix>` - 접두사 설정",
+            "language": "`config server language <lang>` - 언어 설정",
+            "success": "서버 설정 `{key}`이(가) `{value}`(으)로 업데이트되었습니다.",
+            "failure": "서버 설정 `{key}`을(를) 업데이트하지 못했습니다.",
+            "no_permission": "서버 설정을 관리할 권한이 없습니다."
+        }, 
+        "user": {
+            "title": "사용자 설정",
+            "language": "`config user language <lang>` - 선호하는 언어 설정",
+            "success": "사용자 설정 `{key}`이(가) `{value}`(으)로 업데이트되었습니다.",
+            "failure": "사용자 설정 `{key}`을(를) 업데이트하지 못했습니다."
+        }
+    },
+    "ar": {
+        "title": "자동응답",
+        "description": "자동응답을 관리하세요.",
+        "failure": {
+            "no_permission": "자동응답을 관리할 권한이 없습니다.",
+            "not_found": "`{name}`을(를) 찾을 수 없습니다!.",
+            "invalid_name": "잘못된 자동응답 이름입니다. 영문자와 숫자만 사용할 수 있으며, 공백은 허용되지 않습니다.",
+            "argument_missing": "필수 인수 `{arg}`이(가) 누락되었습니다.",
+            "no_autoresponders": "등록된 자동응답이 없습니다."
+        },
+        "create": {
+            "title": "생성",
+            "success": "`{name}`이(가) 성공적으로 생성되었습니다.",
+            "failure": "자동응답 `{name}`을(를) 생성하지 못했습니다."
+        },
+        "edit": {
+            "title": "수정",
+            "success": "`{name}`이(가) 성공적으로 수정되었습니다.",
+            "failure": "자동응답 `{name}`을(를) 수정하지 못했습니다."
+        },
+        "delete": {
+            "title": "삭제",
+            "success": "`{name}`이(가) 성공적으로 삭제되었습니다.",
+            "failure": "자동응답 `{name}`을(를) 삭제하지 못했습니다."
+        }
+    }
+}

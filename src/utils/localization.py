@@ -8,7 +8,7 @@ class Localization:
         self.languages = defaultdict(dict)
         self.load_languages()
 
-    supported_languages = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'ja', 'ko', 'zh']
+    
     
     def load_languages(self):
         """load all language files"""
@@ -33,3 +33,4 @@ class Localization:
         return entry
 
 localization = Localization()
+supported_languages = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'ja', 'ko', 'zh']

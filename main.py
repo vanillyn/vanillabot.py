@@ -26,7 +26,7 @@ async def on_ready():
 @bot.event
 async def setup_hook():
     for cog in os.listdir("./src/cogs"):
-        if cog.endswith(".py"):
+        if cog.endswith(".py") and not cog.startswith("__"):
             try:
                 await bot.load_extension(f"src.cogs.{cog[:-3]}")
                 print(f"Loaded {cog}")

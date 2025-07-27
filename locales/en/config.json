@@ -1,0 +1,46 @@
+{
+    "config": {
+        "title": "Configuration",
+        "description": "Manage your server's configuration settings with the following options:",
+        "server": {
+            "title": "Server Settings",
+            "prefix": "`config server prefix <prefix>` - Set prefix",
+            "language": "`config server language <lang>` - Set language",
+            "success": "Server setting `{key}` updated to `{value}`",
+            "failure": "Failed to update server setting `{key}`",
+            "no_permission": "You do not have permission to manage server settings."
+        }, 
+        "user": {
+            "title": "User Settings",
+            "language": "`config user language <lang>` - Set your preferred language",
+            "success": "User setting `{key}` updated to `{value}`",
+            "failure": "Failed to update user setting `{key}`"
+        }
+    },
+    "ar": {
+        "title": "Autoresponders",
+        "description": "Manage autoresponders.",
+        "failure": {
+            "no_permission": "You do not have permission to manage autoresponders.",
+            "not_found": "`{name}` not found!.",
+            "invalid_name": "Invalid autoresponder name. It must be alphanumeric, and spaces aren't allowed.",
+            "argument_missing": "Missing required argument `{arg}`.",
+            "no_autoresponders": "No autoresponders found."
+        },
+        "create": {
+            "title": "create",
+            "success": "`{name}` created successfully.",
+            "failure": "Failed to create autoresponder `{name}`."
+        },
+        "edit": {
+            "title": "edit",
+            "success": "`{name}` edited successfully.",
+            "failure": "Failed to edit autoresponder `{name}`."
+        },
+        "delete": {
+            "title": "delete",
+            "success": "`{name}` deleted successfully.",
+            "failure": "Failed to delete autoresponder `{name}`."
+        }
+    }
+}

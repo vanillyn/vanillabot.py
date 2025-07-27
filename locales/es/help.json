@@ -1,0 +1,85 @@
+{
+	"help": {
+		"title": "Ayuda",
+		"args": ["embed|text", "lang", "command"],
+		"description": "Muestra el mensaje de ayuda con los comandos disponibles.",
+		"details": "Obtén detalles sobre un comando específico ejecutando `help <comando>`."
+	},
+	"ping": {
+		"title": "Ping",
+		"args": ["lang"],
+		"description": "Verifica la latencia del bot.",
+		"details": "Devuelve un pong, como siempre."
+	},
+	"config": {
+		"title": "Configuración",
+		"args": ["key", "value"],
+		"description": "Administra la configuración del bot.",
+		"details": "Puedes establecer valores de configuración enviando `config <clave> <valor>`, por ejemplo, `config prefix ly:`.\nPara ver todos los valores de una clave, ejecuta `config <clave>`. Algunas claves pueden tener subconjuntos de claves, y al ejecutarlo mostrará los valores de esos subconjuntos. Por ejemplo, `config log` mostrará los valores de todas las configuraciones relacionadas con el registro.\nPor ejemplo, para editar el canal de registro para acciones de moderación, puedes ejecutar `config log/moderation/channel <channel_id>`."
+	},
+	"ban": {
+		"title": "Banear",
+		"args": ["user", "duration", "reason"],
+		"description": "Banea a un usuario del servidor.",
+		"details": "Puedes establecer una duración, después de la cual el usuario será desbaneado. Se debe proporcionar una razón para mayor claridad. Requiere el permiso de 'Banear Miembros'."
+	},
+	"unban": {
+		"title": "Desbanear",
+		"args": ["user", "reason"],
+		"description": "Desbanea a un usuario del servidor.",
+		"details": "Requiere el permiso de 'Banear Miembros'."
+	},
+	"kick": {
+		"title": "Expulsar",
+		"args": ["user", "reason"],
+		"description": "Expulsa a un usuario del servidor.",
+		"details": "Requiere el permiso de 'Expulsar Miembros'."
+	},
+	"timeout": {
+		"title": "Tiempo fuera",
+		"args": ["user", "duration", "reason"],
+		"description": "Pone a un usuario en tiempo fuera por una duración específica.",
+		"details": "Requiere el permiso de 'Tiempo fuera de miembros'."
+	},
+	"warn": {
+		"title": "Advertir",
+		"args": ["user", "reason"],
+		"description": "Emite una advertencia a un usuario.",
+		"details": "Se requiere una razón. Requiere el permiso de 'Gestionar mensajes'."
+	},
+	"note": {
+		"title": "Nota",
+		"args": ["user", "note", "global"],
+		"description": "Agrega una nota al perfil de un usuario.",
+		"details": "Requiere el permiso de 'Gestionar servidor'. Para notas globales, necesitas autenticarte."
+	},
+	"wiki": {
+		"title": "Wiki",
+		"args": ["query", "lang", "embed|text", "sensitive"],
+		"description": "Busca información en la wiki.",
+		"details": "Devuelve una entrada de la wiki. Por defecto, la información sensible estará oculta. Puedes mostrar información sensible agregando 'sensitive' al comando."
+	},
+	"translate": {
+		"title": "Traducir",
+		"args": ["text", "source_lang", "target_lang"],
+		"description": "Traduce texto de un idioma a otro.",
+		"details": "El texto debe estar entre comillas. Los idiomas deben ser códigos de dos letras, por ejemplo EN para inglés o JA para japonés."
+	},
+	"autoresponder": {
+		"title": "Auto Respuesta",
+		"args": ["create/delete/edit/list", "name", "trigger", "response", "lang"],
+		"description": "Administra respuestas automáticas a mensajes específicos.",
+		"details": "Los nombres y desencadenantes deben ser únicos. El desencadenante y la respuesta deben estar entre comillas, para mayor claridad. Por ejemplo: `ar create saludo \"¡Hola!\" \"¡Hi!\"`.\nTambién puedes especificar en qué idioma está la respuesta. Puedes traducir tu autorespuesta usando `ar edit <nombre> <respuesta> <idioma>`.\nLas autorespuestas pueden usar marcadores y acciones. Por ejemplo, puedes usar `{user}` para mencionar al usuario que activó el mensaje. También puedes usar `{react::emoji:}` para agregar una reacción al mensaje activador. Para obtener una lista de los marcadores disponibles, puedes ejecutar `help placeholders`."
+	},
+	"info": {
+		"title": "Información",
+		"args": ["user"],
+		"description": "Muestra información sobre un usuario.",
+		"details": "Si tienes el permiso de 'Banear Miembros', puedes ver infracciones del usuario, como advertencias y notas."
+	},
+	"placeholders": {
+		"title": "Marcadores",
+		"description": "Lista de marcadores disponibles para usar en autorespuestas y otros comandos.",
+		"details": "`{user}`: Menciona al usuario que activó el comando.\n`{user_name}`: Nombre del usuario que activó el comando.\n`{user_id}`: ID del usuario.\n`{mention_name}`: Nombre del usuario mencionado.\n`{mention_id}`: ID del usuario mencionado.\n`{mention_join_date}`: Fecha de ingreso del usuario mencionado.\n`{creator_name}`: Nombre del creador del comando.\n`{creator_id}`: ID del creador del comando.\n`{server_name}`: Nombre del servidor.\n`{server_id}`: ID del servidor.\n`{channel}`: Canal donde se activó el comando.\n`{channel_name}`: Nombre del canal.\n`{react::emoji:}`: Agrega una reacción al mensaje activador con el emoji especificado.\n`{time}`: Hora actual.\n`{date}`: Fecha actual.\n`{join_date}`: Fecha de ingreso del usuario.\n`{top_role}`: Rol más alto del usuario.\n`{creation_date}`: Fecha de creación de un usuario.\n`{server_creation_date}`: Fecha de creación del servidor.\n`{member_count}`: Número de miembros en el servidor.\n`{member_count_ordinal}`: Obtiene el número ordinal de miembros."
+	}
+}

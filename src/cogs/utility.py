@@ -42,11 +42,10 @@ class Utility(commands.Cog):
                 color=discord.Color.purple()
             )
             if details:
-                embed.add_field(name="info:", value=details, inline=False)
                 while details:
                     chunk = details[:1024]
                     details = details[1024:]
-                    embed.add_field(name="details", value=chunk, inline=False)
+                    embed.add_field(name="info:", value=chunk, inline=False)
                     
             await ctx.send(embed=embed)
             return

@@ -1,0 +1,85 @@
+{
+	"help": {
+		"title": "도움말",
+		"args": ["embed|text", "lang", "command"],
+		"description": "사용 가능한 명령어 목록을 표시합니다.",
+		"details": "`help <command>`를 실행하여 특정 명령어에 대한 자세한 정보를 확인할 수 있습니다."
+	},
+	"ping": {
+		"title": "핑",
+		"args": ["lang"],
+		"description": "봇의 지연 시간을 확인합니다.",
+		"details": "항상 그렇듯이 퐁을 반환합니다."
+	},
+	"config": {
+		"title": "설정",
+		"args": ["key", "value"],
+		"description": "봇의 설정을 관리합니다.",
+		"details": "`config <key> <value>`를 입력하여 설정 값을 변경할 수 있습니다. 예시: `config prefix ly:`\n특정 키의 모든 값을 보려면 `config <key>`를 실행하세요. 일부 키는 하위 키를 가질 수 있으며, 해당 명령을 실행하면 하위 키의 값을 볼 수 있습니다. 예를 들어, `config log`를 실행하면 모든 로그 관련 설정 값을 확인할 수 있습니다.\n예시로, 모더레이션 로그 채널을 변경하려면 `config log/moderation/channel <channel_id>`를 실행하세요."
+	},
+	"ban": {
+		"title": "차단",
+		"args": ["user", "duration", "reason"],
+		"description": "서버에서 사용자를 차단합니다.",
+		"details": "지정한 기간 후에 차단이 해제될 수 있습니다. 명확한 이유를 입력해야 합니다. '멤버 차단' 권한이 필요합니다."
+	},
+	"unban": {
+		"title": "차단 해제",
+		"args": ["user", "reason"],
+		"description": "서버에서 사용자의 차단을 해제합니다.",
+		"details": "'멤버 차단' 권한이 필요합니다."
+	},
+	"kick": {
+		"title": "추방",
+		"args": ["user", "reason"],
+		"description": "서버에서 사용자를 추방합니다.",
+		"details": "'멤버 추방' 권한이 필요합니다."
+	},
+	"timeout": {
+		"title": "타임아웃",
+		"args": ["user", "duration", "reason"],
+		"description": "지정한 시간 동안 사용자를 타임아웃 처리합니다.",
+		"details": "'멤버 타임아웃' 권한이 필요합니다."
+	},
+	"warn": {
+		"title": "경고",
+		"args": ["user", "reason"],
+		"description": "사용자에게 경고를 발급합니다.",
+		"details": "이유를 반드시 입력해야 합니다. '메시지 관리' 권한이 필요합니다."
+	},
+	"note": {
+		"title": "노트",
+		"args": ["user", "note", "global"],
+		"description": "사용자 프로필에 노트를 추가합니다.",
+		"details": "'서버 관리' 권한이 필요합니다. 글로벌 노트는 인증이 필요합니다."
+	},
+	"wiki": {
+		"title": "위키",
+		"args": ["query", "lang", "embed|text", "sensitive"],
+		"description": "위키에서 정보를 검색합니다.",
+		"details": "위키 항목을 반환합니다. 기본적으로 민감한 정보는 숨겨집니다. 'sensitive'를 추가하면 민감한 정보를 표시할 수 있습니다."
+	},
+	"translate": {
+		"title": "번역",
+		"args": ["text", "source_lang", "target_lang"],
+		"description": "텍스트를 다른 언어로 번역합니다.",
+		"details": "텍스트는 따옴표로 감싸야 합니다. 언어 코드는 두 글자(예: EN은 영어, JA는 일본어)로 입력해야 합니다."
+	},
+	"autoresponder": {
+		"title": "자동 응답",
+		"args": ["create/delete/edit/list", "name", "trigger", "response", "lang"],
+		"description": "특정 메시지에 대한 자동 응답을 관리합니다.",
+		"details": "이름과 트리거는 고유해야 합니다. 트리거와 응답은 명확하게 따옴표로 감싸야 합니다. 예시: `ar create greeting \"Hello!\" \"Hi!\"`\n응답 언어도 지정할 수 있습니다. `ar edit <name> <response> <lang>`로 자동 응답을 번역할 수 있습니다.\n자동 응답은 플레이스홀더와 액션을 사용할 수 있습니다. 예를 들어 `{user}`로 트리거한 사용자를 멘션할 수 있습니다. `{react::emoji:}`로 트리거 메시지에 이모지를 반응으로 추가할 수 있습니다. 사용 가능한 플레이스홀더 목록은 `help placeholders`로 확인할 수 있습니다."
+	},
+	"info": {
+		"title": "정보",
+		"args": ["user"],
+		"description": "사용자에 대한 정보를 표시합니다.",
+		"details": "'멤버 차단' 권한이 있으면 경고, 노트 등 해당 사용자의 제재 내역을 볼 수 있습니다."
+	},
+	"placeholders": {
+		"title": "플레이스홀더",
+		"description": "자동 응답 및 기타 명령어에서 사용할 수 있는 플레이스홀더 목록입니다.",
+		"details": "`{user}`: 트리거한 사용자를 멘션합니다.\n`{user_name}`: 트리거한 사용자의 이름입니다.\n`{user_id}`: 사용자의 ID입니다.\n`{mention_name}`: 멘션된 사용자의 이름입니다.\n`{mention_id}`: 멘션된 사용자의 ID입니다.\n`{mention_join_date}`: 멘션된 사용자의 가입일입니다.\n`{creator_name}`: 명령어 생성자의 이름입니다.\n`{creator_id}`: 명령어 생성자의 ID입니다.\n`{server_name}`: 서버 이름입니다.\n`{server_id}`: 서버 ID입니다.\n`{channel}`: 명령어가 실행된 채널입니다.\n`{channel_name}`: 채널 이름입니다.\n`{react::emoji:}`: 지정한 이모지로 트리거 메시지에 반응을 추가합니다.\n`{time}`: 현재 시간입니다.\n`{date}`: 현재 날짜입니다.\n`{join_date}`: 사용자의 가입일입니다.\n`{top_role}`: 사용자의 최상위 역할입니다.\n`{creation_date}`: 사용자의 생성일입니다.\n`{server_creation_date}`: 서버의 생성일입니다.\n`{member_count}`: 서버의 멤버 수입니다.\n`{member_count_ordinal}`: 멤버 수의 서수입니다."
+	}
+}

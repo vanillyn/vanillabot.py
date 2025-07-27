@@ -32,7 +32,7 @@ class ConfigCog(commands.Cog):
         )
         embed.add_field(
             name="Available Languages",
-            value=f"Currently supported languages: {', '.join(supported_languages)}\n(Contribute to add your own language!)[https://github.com/vanillyn/vanillabot.py]",
+            value=f"Currently supported languages: {', '.join(supported_languages)}\n[Contribute to add your own language!](https://github.com/vanillyn/vanillabot.py)",
             inline=False
         )
         embed.add_field(
@@ -64,7 +64,7 @@ class ConfigCog(commands.Cog):
         if language.lower() not in supported_languages:
             embed = discord.Embed(
                 title="Invalid Language",
-                description=f"Currently supported languages: {', '.join(supported_languages)}\n(Contribute to add your own language!)[https://github.com/vanillyn/vanillabot.py]",
+                description=f"Currently supported languages: {', '.join(supported_languages)}\n[Contribute to add your own language!](https://github.com/vanillyn/vanillabot.py)",
                 color=0xff0000
             )
             await ctx.send(embed=embed)
@@ -80,6 +80,12 @@ class ConfigCog(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             logger.error(f"Failed to update user language: {e}")
+            embed = discord.Embed(
+                title="Error",
+                description=f"Failed to update your language preference.\nError: {str(e)}",
+                color=0xff0000
+            )
+            await ctx.send(embed=embed)
 
     @config.group(name='server', invoke_without_command=True)
     @commands.has_permissions(manage_guild=True)
@@ -124,16 +130,21 @@ class ConfigCog(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             logger.error(f"Failed to update server prefix: {e}")
+            embed = discord.Embed(
+                title="Error",
+                description=f"Failed to update server prefix.\nError: {str(e)}",
+                color=0xff0000
+            )
             await ctx.send(embed=embed)
 
     @config_server.command(name='language')
     @commands.has_permissions(manage_guild=True)
     async def set_server_language(self, ctx, language: str):
         
-        if language.lower() not in supported_languages:
+        if language.lower() not in supported_languages or None:
             embed = discord.Embed(
                 title="Invalid Language",
-                description=f"Currently supported languages: {', '.join(supported_languages)}\n(Contribute to add your own language!)[https://github.com/vanillyn/vanillabot.py]",
+                description=f"Currently supported languages: {', '.join(supported_languages)}\n[Contribute to add your own language!](https://github.com/vanillyn/vanillabot.py)",
                 color=0xff0000
             )
             await ctx.send(embed=embed)
@@ -149,6 +160,12 @@ class ConfigCog(commands.Cog):
             await ctx.send(embed=embed)
         except Exception as e:
             logger.error(f"Failed to update server language: {e}")
+            embed = discord.Embed(
+                title="Error",
+                description=f"Failed to update server language.\nError: {str(e)}",
+                color=0xff0000
+            )
+            await ctx.send(embed=embed)
 
     @config.command(name='view')
     async def view_config(self, ctx):

@@ -95,7 +95,7 @@ def get_guild_triggers(guild_id: str) -> List[dict]:
 
 
 def update_autoresponder(guild_id: str, name: str, response: str, language: str = "en"):
-    """Update an existing autoresponder response"""
+    """update an existing autoresponder response"""
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
         c.execute(
@@ -260,11 +260,6 @@ class AutoresponderCog(commands.Cog):
         )
         embed.add_field(name="Delete", value="`!ar delete <name>`", inline=False)
         embed.add_field(name="List", value="`!ar list`", inline=False)
-        embed.add_field(
-            name="Placeholders",
-            value="`{user}` - mention user\n`{react::emoji:}` - react with emoji\n`{member_count_ordinal}` - server member count",
-            inline=False,
-        )
         await ctx.send(embed=embed)
 
     @autoresponder.command(name="create")
@@ -274,7 +269,7 @@ class AutoresponderCog(commands.Cog):
         guild_id = str(ctx.guild.id)
 
         if autoresponder_exists(guild_id, name):
-            await ctx.send(f"❌ Autoresponder `{name}` already exists!")
+            await ctx.send(f"Autoresponder `{name}` already exists!")
             return
 
         create_autoresponder(
@@ -300,7 +295,7 @@ class AutoresponderCog(commands.Cog):
         guild_id = str(ctx.guild.id)
 
         if not autoresponder_exists(guild_id, name):
-            await ctx.send(f"❌ Autoresponder `{name}` not found!")
+            await ctx.send(f"Autoresponder `{name}` not found!")
             return
 
         if update_autoresponder(guild_id, name, response, language):
@@ -345,9 +340,9 @@ class AutoresponderCog(commands.Cog):
         guild_id = str(ctx.guild.id)
 
         if delete_autoresponder(guild_id, name):
-            await ctx.send(f"✅ Autoresponder `{name}` deleted!")
+            await ctx.send(f"Autoresponder `{name}` deleted!")
         else:
-            await ctx.send(f"❌ Autoresponder `{name}` not found!")
+            await ctx.send(f"Autoresponder `{name}` not found!")
 
     @autoresponder.command(name="list")
     async def ar_list(self, ctx):
@@ -384,11 +379,11 @@ class AutoresponderCog(commands.Cog):
     @ar_delete.error
     async def ar_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"❌ Missing required argument: `{error.param.name}`")
+            await ctx.send(f"Missing required argument: `{error.param.name}`")
         elif isinstance(error, commands.BadArgument):
-            await ctx.send("❌ Invalid argument provided.")
+            await ctx.send("Invalid argument provided.")
         elif isinstance(error, commands.CommandInvokeError):
-            await ctx.send("❌ An error occurred while processing your command.")
+            await ctx.send("An error occurred while processing your command.")
 
 
 async def setup(bot):
