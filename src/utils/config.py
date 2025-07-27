@@ -1,6 +1,4 @@
 import sqlite3
-import os
-
 DB_PATH = "config.db"
 
 
@@ -21,6 +19,17 @@ def init_config():
                 language TEXT DEFAULT 'en'
             )
         """)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS autoresponders (
+                guild_id TEXT,
+                name TEXT,
+                trigger TEXT,
+                response TEXT,
+                language TEXT DEFAULT 'en',
+                creator_id INTEGER,
+                PRIMARY KEY (guild_id, name, language)
+            )
+        """)
         conn.commit()
 
 
@@ -34,10 +43,12 @@ def set_guild_config(guild_id, key, value):
             VALUES (?, ?)
             ON CONFLICT(guild_id) DO UPDATE SET ? = excluded.?
         """,
-            key,
-            (str(guild_id), value),
-            key,
-            key,
+            (
+                key,
+                (str(guild_id), value),
+                key,
+                key,
+            ),
         )
         conn.commit()
 
@@ -46,9 +57,14 @@ def get_guild_config(guild_id, key):
     """get a configuration value for a guild"""
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
-        c.execute("SELECT ? FROM guild WHERE guild_id = ?", key, (str(guild_id),))
+        c.execute(
+            "SELECT ? FROM guild WHERE guild_id = ?",
+            (
+                key,
+                guild_id,
+            ),
+        )
         row = c.fetchone()
-        print("getting guild config:", row)
         return row[0] if row else None
 
 
@@ -62,10 +78,13 @@ def set_user_config(user_id, key, value):
             VALUES (?, ?)
             ON CONFLICT(user_id) DO UPDATE SET ? = excluded.?
         """,
-            key,
-            (str(user_id), value),
-            key,
-            key,
+            (
+                key,
+                str(user_id),
+                value,
+                key,
+                key,
+            ),
         )
         conn.commit()
 
@@ -74,6 +93,12 @@ def get_user_config(user_id, key):
     """get a configuration value for a user"""
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
-        c.execute("SELECT ? FROM user WHERE user_id = ?", key, (str(user_id),))
+        c.execute(
+            "SELECT ? FROM user WHERE user_id = ?",
+            (
+                key,
+                user_id,
+            ),
+        )
         row = c.fetchone()
         return row[0] if row else None
