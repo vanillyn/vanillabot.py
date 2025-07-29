@@ -2,10 +2,12 @@
     "ban": {
         "success": "{user} ({user_id}) has been banned{for_duration}. Reason: {reason}",
         "failure": "Failed to ban user {user}.",
+        "invalid_duration": "Invalid duration format. Use '1h', '30m', '2d', etc.",
         "already_banned": "User {user} is already banned.",
+        "no_reason": "No reason provided.",
         "no_permission": "You do not have permission to ban users.",
         "message_failed": "Failed to send ban message to {user}.",
-        "message": "You have been banned from the server{for_duration}. Reason: {reason}"
+        "message": "You have been banned from {guild}{for_duration}. Reason: {reason}"
     },
     "unban": {
         "success": "{user} ({user_id}) has been unbanned. Reason: {reason}",
@@ -18,13 +20,15 @@
         "failure": "Failed to kick user {user}.",
         "no_permission": "You do not have permission to kick users.",
         "message_failed": "Failed to send kick message to {user}.",
-        "message": "You have been kicked from the server. Reason: {reason}"
+        "message": "You have been kicked from {guild}. Reason: {reason}"
     }, 
     "warn": {
         "success": "{user} has been warned. Reason: {reason}",
         "failure": "Failed to warn user {user}.",
         "no_permission": "You do not have permission to warn users.",
         "message_failed": "Failed to send warning message to {user}.",
+        "no_reason": "You must provide a reason for the warning.",
+        "no_user": "You must specify a user to warn.",
         "message": "You have been warned. Reason: {reason}"
     }, 
     "note": {
@@ -32,12 +36,16 @@
         "success_global": "Note added to {user}'s profile: {note}",
         "failure_local": "Failed to add note to {user}'s profile for this server.",
         "failure_global": "Failed to add global note to {user}'s profile.",
+        "no_note": "You must provide a note to add.",
+        "no_user": "You must specify a user to add a note for.",
         "no_permission": "You do not have permission to add notes.", 
         "no_global_permission": "To add global notes, you need to authenticate."
     },
     "timeout": {
         "success": "{user} ({user_id}) has been put in timeout for {duration}. Reason: {reason}",
         "failure": "Failed to put user {user} in timeout.",
+        "invalid_duration": "Invalid duration format. Use '1h', '30m', '2d', etc.",
+        "already_in_timeout": "User {user} is already in timeout.",
         "no_permission": "You do not have permission to put users in timeout.",
         "message_failed": "Failed to send timeout message to {user}.",
         "message": "You have been put in timeout for {duration}. Reason: {reason}"

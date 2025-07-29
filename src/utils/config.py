@@ -30,6 +30,27 @@ def init_config():
                 PRIMARY KEY (guild_id, name, language)
             )
         """)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS moderation (
+                guild_id INTEGER,
+                user_id INTEGER,
+                type TEXT,
+                reason TEXT,
+                issued_by INTEGER,
+                timestamp TEXT,
+                PRIMARY KEY (guild_id, user_id, timestamp)
+            )
+        """)
+
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS notes (
+                user_id INTEGER,
+                note TEXT,
+                added_by INTEGER,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (user_id, timestamp)
+            )
+        """)
         conn.commit()
 
 
@@ -102,3 +123,53 @@ def get_user_config(user_id, key):
         )
         row = c.fetchone()
         return row[0] if row else None
+
+def add_infraction(guild_id, user_id, type, reason, duration, actor_id):
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("""
+            INSERT INTO infractions (guild_id, user_id, type, reason, duration, actor_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (guild_id, user_id, type, reason, duration, actor_id))
+        conn.commit()
+
+def get_infractions(guild_id, user_id):
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("""
+            SELECT type, reason, created_at, duration, actor_id FROM infractions
+            WHERE guild_id = ? AND user_id = ?
+            ORDER BY created_at DESC
+        """, (guild_id, user_id))
+        return c.fetchall()
+    
+def add_note(user_id, note, added_by):
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("""
+            INSERT INTO notes (user_id, note, added_by, timestamp)
+            VALUES (?, ?, ?, datetime('now'))
+        """, (user_id, note, added_by))
+        conn.commit()
+        
+def get_notes(user_id):
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("""
+            SELECT note, added_by, timestamp FROM notes
+            WHERE user_id = ?
+            ORDER BY timestamp DESC
+        """, (user_id,))
+        return c.fetchall()
+    
+def get_language(user_id, guild_id):
+    """get the language for a user, and if not, the guild"""
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("SELECT language FROM user WHERE user_id = ?", (user_id,))
+        row = c.fetchone()
+        if row:
+            return row[0]
+        c.execute("SELECT language FROM guild WHERE guild_id = ?", (guild_id,))
+        row = c.fetchone()
+        return row[0] if row else 'en'
