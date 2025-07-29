@@ -1,4 +1,5 @@
 import sqlite3
+import datetime as dt
 DB_PATH = "config.db"
 
 
@@ -31,14 +32,15 @@ def init_config():
             )
         """)
         c.execute("""
-            CREATE TABLE IF NOT EXISTS moderation (
+            CREATE TABLE IF NOT EXISTS infractions (
                 guild_id INTEGER,
                 user_id INTEGER,
                 type TEXT,
                 reason TEXT,
+                duration TEXT,
                 issued_by INTEGER,
-                timestamp TEXT,
-                PRIMARY KEY (guild_id, user_id, timestamp)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (guild_id, user_id, created_at)
             )
         """)
 
@@ -124,20 +126,21 @@ def get_user_config(user_id, key):
         row = c.fetchone()
         return row[0] if row else None
 
-def add_infraction(guild_id, user_id, type, reason, duration, actor_id):
+def add_infraction(guild_id, user_id, type, reason, duration, issued_by):
     with sqlite3.connect(DB_PATH) as conn:
+        timestamp = dt.datetime.now()
         c = conn.cursor()
         c.execute("""
-            INSERT INTO infractions (guild_id, user_id, type, reason, duration, actor_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (guild_id, user_id, type, reason, duration, actor_id))
+            INSERT INTO infractions (guild_id, user_id, type, reason, duration, issued_by, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (guild_id, user_id, type, reason, duration, issued_by, timestamp))
         conn.commit()
 
 def get_infractions(guild_id, user_id):
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
         c.execute("""
-            SELECT type, reason, created_at, duration, actor_id FROM infractions
+            SELECT type, reason, created_at, duration, issued_by FROM infractions
             WHERE guild_id = ? AND user_id = ?
             ORDER BY created_at DESC
         """, (guild_id, user_id))

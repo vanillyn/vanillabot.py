@@ -26,7 +26,7 @@ class Moderation(commands.Cog):
             ctx.send(warn.get("no_user", "[lang error] No user specified."))
             return
         try: 
-            config.add_infraction(ctx.guild.id, member.id, "warn", reason, ctx.author.id)
+            config.add_infraction(ctx.guild.id, member.id, "warn", reason, None,     ctx.author.id)
             await member.send(warn.get("message", "[lang error] You have been warned. Reason: {reason}").format(reason=reason))
         except discord.Forbidden:
             await ctx.send(warn.get("message_failed", "[lang error] Failed to send warning message to {user}.").format(user=member.mention))
@@ -104,7 +104,7 @@ class Moderation(commands.Cog):
                 return
             await member.ban(reason=reason)
             config.add_infraction(ctx.guild.id, member.id, "ban", reason, delta, ctx.author.id)
-            await ctx.send(ban_msg.get("success", "[lang error] User {user} has been banned.").format(user=member.mention, user_id=member.id, reason=reason))
+            await ctx.send(ban_msg.get("success", "[lang error] User {user} has been banned.").format(user=member.mention, user_id=member.id, for_duration=f" for {delta}" if duration else "", reason=reason))
         except discord.Forbidden:
             await ctx.send(ban_msg.get("no_permission", "[lang error] You do not have permission to ban users."))
         except Exception as e:
@@ -179,6 +179,21 @@ class Moderation(commands.Cog):
         embed.add_field(name="Joined at", value=member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
         embed.add_field(name="Created at", value=member.created_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
         
+        infractions = config.get_infractions(ctx.guild.id, member.id)
+        
+        if infractions:
+            infraction_list = "\n".join([f"{inf[2]} | {inf[0]} by <@{inf[4]}>: {inf[1]}" for inf in infractions])
+            embed.add_field(name="Infractions", value=infraction_list, inline=False)
+        else:
+            embed.add_field(name="Infractions", value="No infractions found.", inline=False)
+        
+        notes = config.get_notes(member.id)
+        if notes:
+            note_list = "\n".join([f"{note[0]} (by <@{note[1]}> on {note[2]})" for note in notes])
+            embed.add_field(name="Notes", value=note_list, inline=False)
+        else:
+            embed.add_field(name="Notes", value="No notes found.", inline=False)
+            
         await ctx.send(embed=embed)
         
     @commands.command(name='timeout')
