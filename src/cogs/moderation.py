@@ -61,7 +61,7 @@ class Moderation(commands.Cog):
             return
     
         if public:
-            ctx.send("global notes arent implemented yet.")
+            await ctx.send("global notes arent implemented yet.")
             # config.add_note(member.id, note, ctx.author.id)
         else:
             config.add_infraction(ctx.guild.id, member.id, "note", note, None, ctx.author.id)
