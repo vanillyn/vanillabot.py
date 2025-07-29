@@ -222,3 +222,6 @@ class Moderation(commands.Cog):
         except Exception as e:
             await ctx.send(timeout_msg.get("failure", "[lang error] Failed to timeout user {user}.").format(user=member.mention))
             print(f"Error timing out user: {e}")
+            
+async def setup(bot):
+    await bot.add_cog(Moderation(bot))

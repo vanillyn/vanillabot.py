@@ -1,11 +1,7 @@
 import discord
-import logging
 from discord.ext import commands
 from src.utils.config import set_guild_config, get_guild_config, set_user_config, get_user_config
 from src.utils.localization import supported_languages
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 class ConfigCog(commands.Cog):
     def __init__(self, bot):
@@ -79,7 +75,6 @@ class ConfigCog(commands.Cog):
             )
             await ctx.send(embed=embed)
         except Exception as e:
-            logger.error(f"Failed to update user language: {e}")
             embed = discord.Embed(
                 title="Error",
                 description=f"Failed to update your language preference.\nError: {str(e)}",
@@ -129,7 +124,6 @@ class ConfigCog(commands.Cog):
             )
             await ctx.send(embed=embed)
         except Exception as e:
-            logger.error(f"Failed to update server prefix: {e}")
             embed = discord.Embed(
                 title="Error",
                 description=f"Failed to update server prefix.\nError: {str(e)}",
@@ -159,7 +153,6 @@ class ConfigCog(commands.Cog):
             )
             await ctx.send(embed=embed)
         except Exception as e:
-            logger.error(f"Failed to update server language: {e}")
             embed = discord.Embed(
                 title="Error",
                 description=f"Failed to update server language.\nError: {str(e)}",
