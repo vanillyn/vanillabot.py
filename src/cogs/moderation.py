@@ -69,7 +69,7 @@ class Moderation(commands.Cog):
         await ctx.send(notem.get("success_local", "[lang error] Note added for {user}.").format(user=member.mention, note=note))
         
     @commands.command(name='ban')
-    @commands.has_permission(ban_members=True)
+    @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member: discord.Member, duration: str = None, *, reason=None):
         """bans a user"""
         lang = config.get_language(ctx.author.id, ctx.guild.id)
