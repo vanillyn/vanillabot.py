@@ -182,7 +182,7 @@ class Moderation(commands.Cog):
         await ctx.send(embed=embed)
         
     @commands.command(name='timeout')
-    @commands.has_permissions(timeout_members=True)
+    @commands.has_permissions(moderate_members=True)
     async def timeout(self, ctx, member: discord.Member, duration: str, *, reason=None):
         """times out a user"""
         lang = config.get_language(ctx.author.id, ctx.guild.id)
