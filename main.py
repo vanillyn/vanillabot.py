@@ -5,6 +5,7 @@ import os
 import src.utils.config as config
 
 from src.utils.localization import localization
+from src.utils.config import get_guild_config
 
 load_dotenv()
 localization.load_languages()
@@ -14,8 +15,13 @@ intents.message_content = True
 intents.guilds = True
 intents.members = True
 
-prefix = os.getenv("PREFIX", ";")
-bot = commands.Bot(command_prefix=prefix, intents=intents, help_command=None)
+async def get_prefix(bot, message):
+    guild_id = message.guild.id if message.guild else None
+    prefix = get_guild_config(guild_id, "prefix")
+    return commands.when_mentioned_or(prefix or "ly:")(bot, message)
+
+bot = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
+
 
 
 @bot.event
