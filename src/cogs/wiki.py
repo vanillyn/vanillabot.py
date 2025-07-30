@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 import wikipediaapi
-from src.utils import config, localization
+from src.utils import config
+from src.utils.localization import localization
 
 TOPICS = [
     "lgbtq",
@@ -20,12 +21,21 @@ class Wiki(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        if user.bot:
+            return
+        if reaction.message.author.bot:
+            if str(reaction.emoji) in ["❌", "🗑️"]:
+                await reaction.message.delete()
+
     @commands.command(name="wiki")
     @commands.has_permissions(embed_links=True)
     async def wiki(self, ctx, *, query):
         user_id = ctx.author.id
         lang = config.get_user_config(user_id, "language") or "en"
         msg_type = config.get_user_config(user_id, "message_type") or "embed"
+        msg = localization.languages.get(lang, {}).get("wiki", {})
 
         wiki = wikipediaapi.Wikipedia(
             user_agent="berrylyn/0.1 (wiki/mod bot for queer-focused discord servers by @vanillyn, https://github.com/vanillyn/vanillabot.py)",
@@ -44,13 +54,13 @@ class Wiki(commands.Cog):
             page = wiki.page(query)
 
         if not page.exists():
-            await ctx.send(localization.get("wiki", "not_found").format(query=query))
+            await ctx.send(msg.get("not_found").format(query=query))
             return
 
-        categories = page.categories.keys()
-        if not any(any(kw in cat.lower() for kw in TOPICS) for cat in categories):
-            await ctx.send(localization.get("wiki", "off_topic").format(query=query))
-            return
+        #categories = page.categories.keys()
+        #if not any(any(kw in cat.lower() for kw in TOPICS) for cat in categories):
+        #    await ctx.send(msg.get("off_topic").format(query=query))
+        #    return
 
         summary = page.summary.split("\n")[0]
         url = page.fullurl

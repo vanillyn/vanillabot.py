@@ -1,4 +1,4 @@
 {
-    "not_found": "No article found for {query}",
-    "off_topic": "{query} seems to be off-topic. Try a related term like `transgender`."
+    "not_found": "No article found for {query}.",
+    "off_topic": "`{query}` seems to be off-topic. Try a related term like `transgender`."
 }

@@ -27,7 +27,7 @@ class Localization:
         lang = lang or self.default_lang
         entry = self.languages.get(lang, {}).get(section, {}).get(key)
         if not entry and fallback:
-            entry = self.languages.get(self.default_lang, {}).get(section, {}).get(key, key)
+            entry = self.languages.get(self.default_lang, {}).get(section, {}).get(key)
         if isinstance(entry, str):
             return entry.format(**kwargs)
         return entry

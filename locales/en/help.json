@@ -55,7 +55,7 @@
 	},
 	"wiki": {
 		"title": "Wiki",
-		"args": ["query", "lang", "embed|text", "sensitive"],
+		"args": ["query", "sensitive"],
 		"description": "Searches the wiki for information.",
 		"details": "Returns an entry in the wiki. By default, sensitive information will be hidden. You can show sensitive information by adding 'sensitive' to the command."
 	},
