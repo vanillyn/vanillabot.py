@@ -38,7 +38,7 @@ class Wiki(commands.Cog):
         if not page.exists():
             wiki = wikipediaapi.Wikipedia(
             user_agent="berrylyn/0.1 (wiki/mod bot for queer-focused discord servers by @vanillyn, https://github.com/vanillyn/vanillabot.py)",
-            language="enlanguage",
+            language="en",
             extract_format=wikipediaapi.ExtractFormat.WIKI,
         )
             page = wiki.page(query)
