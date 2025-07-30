@@ -246,7 +246,6 @@ class AutoresponderCog(commands.Cog):
         lang = cfg.get_user_config(user.id, "language") or "en"
         msg = localization.languages.get(lang, {}).get("config", {})
         armsg = msg.get("ar", {})
-        infomsg = armsg.get("info", {})
 
         if reaction.message.id in self.ar_messages:
             ar_info = self.ar_messages[reaction.message.id]
@@ -257,23 +256,23 @@ class AutoresponderCog(commands.Cog):
 
             elif str(reaction.emoji) == "❓":
                 embed = discord.Embed(
-                    title=infomsg.get("title", "Autoresponder info").format(
+                    title=armsg.get("info", "Autoresponder info").format(name=ar_info["name"]).format(
                         name=ar_info["name"]
                     ),
                     color=discord.Color.blue(),
                 )
                 embed.add_field(
-                    name=infomsg.get("name", "Name"),
+                    name=armsg.get("name", "Name"),
                     value=ar_info["name"],
                     inline=False,
                 )
                 embed.add_field(
-                    name=infomsg.get("trigger", "Trigger"),
+                    name=armsg.get("trigger", "Trigger"),
                     value=ar_info["trigger"],
                     inline=False,
                 )
                 embed.add_field(
-                    name=infomsg.get("creator", "Creator"),
+                    name=armsg.get("creator", "Creator"),
                     value=f"<@{ar_info['creator_id']}>",
                     inline=False,
                 )
