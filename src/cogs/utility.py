@@ -8,14 +8,13 @@ class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.command(name="help")
     async def help(self, ctx, *args):
         """display help information for commands"""
         lang = config.get_user_config(ctx.author.id, "language") or "en"
         message_type = config.get_user_config(ctx.author.id, "message_type") or "embed"
         print(f"Getting help for: {lang}")
-        
+
         if args and args[-1] in localization.languages:
             lang = args[-1]
             args = args[:-1]
@@ -23,7 +22,7 @@ class Utility(commands.Cog):
             prefix = config.get_guild_config(ctx.guild.id, "prefix") or "y;"
         else:
             prefix = "y;"
-    
+
         help_data = localization.languages.get(lang, {}).get("help", {})
         default_lang_data = localization.languages.get("en", {}).get("help", {})
 
@@ -42,7 +41,7 @@ class Utility(commands.Cog):
                 embed = discord.Embed(
                     title=f"!{command} {' '.join(args_list)}",
                     description=desc,
-                    color=discord.Color.purple()
+                    color=discord.Color.purple(),
                 )
                 if details:
                     while details:
@@ -61,8 +60,10 @@ class Utility(commands.Cog):
         if message_type == "embed":
             embed = discord.Embed(
                 title=help_data.get("help", {}).get("title", "Help"),
-                description=help_data.get("help", {}).get("details", "use !help <command> to learn more"),
-                color=discord.Color.purple()
+                description=help_data.get("help", {}).get(
+                    "details", "use !help <command> to learn more"
+                ),
+                color=discord.Color.purple(),
             )
             for name, data in help_data.items():
                 if name == "help" or name == "placeholders":
@@ -71,14 +72,20 @@ class Utility(commands.Cog):
                     continue
                 cmd_args = " ".join(data.get("args", []))
                 cmd_desc = data.get("description", "")
-                embed.add_field(name=f"{prefix}{name} {cmd_args}", value=cmd_desc, inline=False)
-                print(f"Added help field for {name} with args: {cmd_args} and desc: {cmd_desc}")
+                embed.add_field(
+                    name=f"{prefix}{name} {cmd_args}", value=cmd_desc, inline=False
+                )
+                print(
+                    f"Added help field for {name} with args: {cmd_args} and desc: {cmd_desc}"
+                )
 
             print(f"Debug information: {lang}\n{help_data}\n{help_data.items()}")
             await ctx.send(embed=embed)
         else:
             title = help_data.get("help", {}).get("title", "Help")
-            description = help_data.get("help", {}).get("details", "use !help <command> to learn more")
+            description = help_data.get("help", {}).get(
+                "details", "use !help <command> to learn more"
+            )
             text_output = f"**{title}**\n{description}\n\n"
 
             for name, data in help_data.items():
@@ -89,12 +96,13 @@ class Utility(commands.Cog):
                 cmd_args = " ".join(data.get("args", []))
                 cmd_desc = data.get("description", "")
                 text_output += f"**{prefix}{name} {cmd_args}**\n{cmd_desc}\n\n"
-                print(f"Added help field for {name} with args: {cmd_args} and desc: {cmd_desc}")
+                print(
+                    f"Added help field for {name} with args: {cmd_args} and desc: {cmd_desc}"
+                )
 
             print(f"Debug information: {help_data.items()}")
             await ctx.send(text_output.rstrip())
-        
-    
+
     @commands.command(name="ping")
     async def ping(self, ctx, arg=None):
         """check the bots response time"""
