@@ -3,6 +3,8 @@ from discord.ext import commands
 import sqlite3
 import re
 from typing import Optional, List, Tuple
+import src.utils.localization as tr
+import src.utils.config as cfg
 
 DB_PATH = "config.db"
 
@@ -149,6 +151,7 @@ async def process_response(
     message: discord.Message, response: str
 ) -> Tuple[str, List[str]]:
     """processing placeholders in response"""
+    
     reactions = []
 
     react_pattern = r"\{react:(.*?)\}"
@@ -157,7 +160,7 @@ async def process_response(
         reactions.append(emoji)
 
     response = re.sub(react_pattern, "", response)
-
+    
     placeholders = {
         "{user}": message.author.mention,
         "{user_name}": message.author.name,
@@ -240,6 +243,11 @@ class AutoresponderCog(commands.Cog):
         if user.bot:
             return
 
+        lang = cfg.get_user_config(user.id, "language") or "en"
+        msg = tr.languages.get(lang, {}).get("config", {})
+        armsg = msg.get("ar", {})
+        infomsg = armsg.get("info", {})
+        
         if reaction.message.id in self.ar_messages:
             ar_info = self.ar_messages[reaction.message.id]
 
@@ -249,12 +257,12 @@ class AutoresponderCog(commands.Cog):
 
             elif str(reaction.emoji) == "❓":
                 embed = discord.Embed(
-                    title="Autoresponder Info", color=discord.Color.blue()
+                    title=infomsg.get("title", "Autoresponder info").format(name=ar_info["name"]), color=discord.Color.blue()
                 )
-                embed.add_field(name="Name", value=ar_info["name"], inline=False)
-                embed.add_field(name="Trigger", value=ar_info["trigger"], inline=False)
+                embed.add_field(name=infomsg.get("name", "Name"), value=ar_info["name"], inline=False)
+                embed.add_field(name=infomsg.get("trigger", "Trigger"), value=ar_info["trigger"], inline=False)
                 embed.add_field(
-                    name="Creator", value=f"<@{ar_info['creator_id']}>", inline=False
+                    name=infomsg.get("creator", "Creator"), value=f"<@{ar_info['creator_id']}>", inline=False
                 )
 
                 try:
@@ -265,21 +273,25 @@ class AutoresponderCog(commands.Cog):
     @commands.group(name="autoresponder", aliases=["ar"], invoke_without_command=True)
     async def autoresponder(self, ctx):
         """command group for autoresponders"""
+        lang = cfg.get_user_config(ctx.author.id, "language") or "en"
+        msg = tr.languages.get(lang, {}).get("config", {})
+        armsg = msg.get("ar", {})
+        
+        pfx = cfg.get_guild_config(ctx.guild.id, "prefix") or "y;"
+        
         embed = discord.Embed(
-            title="Autoresponder Commands",
-            description="Manage server autoresponders",
+            title=armsg.get("title", "Autoresponders"),
+            description=armsg.get("description", "Manage your autoresponders here."),
             color=discord.Color.blue(),
         )
         embed.add_field(
-            name="Create",
-            value='`!ar create <name> "<trigger>" "<response>" [language]`',
+            name=armsg.get("create", "Create"),
+            value=f"{pfx}{armsg.get("cmds", {}).get("create", "ar create <name> \"<trigger>\" \"<response>\" [language]")}",
             inline=False,
         )
-        embed.add_field(
-            name="Edit", value='`!ar edit <name> "<response>" [language]`', inline=False
-        )
-        embed.add_field(name="Delete", value="`!ar delete <name>`", inline=False)
-        embed.add_field(name="List", value="`!ar list`", inline=False)
+        embed.add_field(name=armsg.get("edit", "Edit"), value=f"{pfx}{armsg.get("cmds", {}).get("edit", "ar edit <name> \"<response>\" [language]")}", inline=False)
+        embed.add_field(name=armsg.get("delete", "Delete"), value=f"{pfx}{armsg.get("cmds", {}).get("delete", "ar delete <name>")}", inline=False)
+        embed.add_field(name=armsg.get("list"), value=f"{pfx}{armsg.get("cmds", {}).get("list", "ar list")}", inline=False)
         await ctx.send(embed=embed)
 
     @autoresponder.command(name="create")

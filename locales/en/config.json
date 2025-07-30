@@ -9,7 +9,7 @@
             "success": "Server setting `{key}` updated to `{value}`",
             "failure": "Failed to update server setting `{key}`",
             "no_permission": "You do not have permission to manage server settings."
-        }, 
+        },
         "user": {
             "title": "User Settings",
             "language": "`config user language <lang>` - Set your preferred language",
@@ -20,27 +20,35 @@
     "ar": {
         "title": "Autoresponders",
         "description": "Manage autoresponders.",
-        "failure": {
-            "no_permission": "You do not have permission to manage autoresponders.",
-            "not_found": "`{name}` not found!.",
-            "invalid_name": "Invalid autoresponder name. It must be alphanumeric, and spaces aren't allowed.",
-            "argument_missing": "Missing required argument `{arg}`.",
-            "no_autoresponders": "No autoresponders found."
+        "no_permission": "You do not have permission to manage autoresponders.",
+        "not_found": "`{name}` not found!.",
+        "delete_failure": "Failed to delete autoresponder `{name}`.",
+        "edit_failure": "Failed to edit autoresponder `{name}`.",
+        "create_failure": "Failed to create autoresponder `{name}`.",
+        "list_failure": "Failed to list autoresponders, somehow. Something must've gone wrong.",
+        "invalid_name": "Invalid autoresponder name. It must be alphanumeric, and spaces aren't allowed.",
+        "argument_missing": "Missing required argument `{arg}`.",
+        "no_autoresponders": "No autoresponders found.",
+        "already_exists": "Autoresponder `{name}` already exists.",
+        "create_success": "`{name}` created successfully.",
+        "edit_success": "`{name}` edited successfully.",
+        "delete_success": "`{name}` deleted successfully.",
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "list": "List",
+        "cmds": {
+            "create": "ar create <name> \"<trigger>\" \"<response>\" [language]",
+            "edit": "ar edit <name> \"<response>\" [language]",
+            "delete": "ar delete <name>",
+            "list": "ar list",
+            "info": "ar info <name>"
         },
-        "create": {
-            "title": "create",
-            "success": "`{name}` created successfully.",
-            "failure": "Failed to create autoresponder `{name}`."
-        },
-        "edit": {
-            "title": "edit",
-            "success": "`{name}` edited successfully.",
-            "failure": "Failed to edit autoresponder `{name}`."
-        },
-        "delete": {
-            "title": "delete",
-            "success": "`{name}` deleted successfully.",
-            "failure": "Failed to delete autoresponder `{name}`."
+        "info": {
+            "title": "Info on {name}",
+            "name": "Name",
+            "trigger": "Trigger",
+            "creator": "Creator"
         }
     }
 }
