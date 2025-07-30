@@ -1,7 +1,10 @@
 import sqlite3
+import json
 import datetime as dt
 DB_PATH = "config.db"
 
+with open("src/utils/keys.json", "r") as f:
+    allowed_keys = json.load(f)
 
 def init_config():
     """makes the configuration database"""
@@ -11,13 +14,20 @@ def init_config():
             CREATE TABLE IF NOT EXISTS guild (
                 guild_id INTEGER PRIMARY KEY,
                 language TEXT DEFAULT 'en',
-                prefix TEXT DEFAULT 'y;'
+                prefix TEXT DEFAULT 'y;',
+                welcomeChannel INTEGER,
+                welcomeMessage TEXT,
+                leaveChannel INTEGER,
+                leaveMessage TEXT,
+                modLogChannel INTEGER,
+                message_type TEXT DEFAULT 'embed'
             )
         """)
         c.execute("""
             CREATE TABLE IF NOT EXISTS user (
                 user_id INTEGER PRIMARY KEY,
-                language TEXT DEFAULT 'en'
+                language TEXT DEFAULT 'en',
+                message_type TEXT DEFAULT 'embed'
             )
         """)
         c.execute("""
@@ -58,21 +68,19 @@ def init_config():
 
 def set_guild_config(guild_id, key, value):
     """set a configuration value for a guild"""
+    
+    if key not in allowed_keys.get("guild", []):
+        raise ValueError(f"Invalid key: {key}. Allowed keys are: {allowed_keys['guild']}")
+    
+    if not isinstance(guild_id, int):
+        raise ValueError("guild_id must be an integer")
+    
     with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            INSERT INTO guild (guild_id, ?)
+        conn.cursor().execute(f"""
+            INSERT INTO guild (guild_id, {key})
             VALUES (?, ?)
-            ON CONFLICT(guild_id) DO UPDATE SET ? = excluded.?
-        """,
-            (
-                key,
-                (str(guild_id), value),
-                key,
-                key,
-            ),
-        )
+            ON CONFLICT(guild_id) DO UPDATE SET {key} = excluded.{key}
+        """, (guild_id, value))
         conn.commit()
 
 
@@ -93,35 +101,32 @@ def get_guild_config(guild_id, key):
 
 def set_user_config(user_id, key, value):
     """set a configuration value for a user"""
+    if key not in allowed_keys.get("user", []):
+        raise ValueError(f"Invalid key: {key}. Allowed keys are: {allowed_keys['user']}")
+    
+    if not isinstance(user_id, int):
+        raise ValueError("user_id must be an integer")
+    
     with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            INSERT INTO user (user_id, ?)
+        conn.cursor().execute(f"""
+            INSERT INTO user (user_id, {key})
             VALUES (?, ?)
-            ON CONFLICT(user_id) DO UPDATE SET ? = excluded.?
-        """,
-            (
-                key,
-                str(user_id),
-                value,
-                key,
-                key,
-            ),
-        )
+            ON CONFLICT(user_id) DO UPDATE SET {key} = excluded.{key}
+        """, (user_id, value))
         conn.commit()
+
 
 
 def get_user_config(user_id, key):
     """get a configuration value for a user"""
+    if key not in allowed_keys.get("user", []):
+        raise ValueError(f"Invalid key: {key}. Allowed keys are: {allowed_keys['user']}")
+    
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
         c.execute(
-            "SELECT ? FROM user WHERE user_id = ?",
-            (
-                key,
-                user_id,
-            ),
+            f"SELECT {key} FROM user WHERE user_id = ?",
+            (user_id,)
         )
         row = c.fetchone()
         return row[0] if row else None

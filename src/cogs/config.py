@@ -17,7 +17,8 @@ class ConfigCog(commands.Cog):
         )
         embed.add_field(
             name="User Settings",
-            value="`config user language <lang>` - Set your language preference",
+            value="`config user set language <lang>` - Set your language preference\n"
+                  "`config user set message_type <type>` - Set your message type preference",
             inline=False
         )
         embed.add_field(
@@ -53,31 +54,50 @@ class ConfigCog(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @config_user.command(name='language')
-    async def set_user_language(self, ctx, language: str):
-        """set user language"""
-
-        if language.lower() not in supported_languages:
+    @config_user.command(name='set')
+    async def set_user_config_generic(self, ctx, key: str, *, value: str):
+        """Set a user configuration value"""
+        
+        if key == 'language':
+            if value.lower() not in supported_languages:
+                embed = discord.Embed(
+                    title="Invalid Language",
+                    description=f"Currently supported languages: {', '.join(supported_languages)}\n[Contribute to add your own language!](https://github.com/vanillyn/vanillabot.py)",
+                    color=0xff0000
+                )   
+                await ctx.send(embed=embed)
+                return
+        elif key == 'message_type':
+            if value.lower() not in ['embed', 'text']:
+                embed = discord.Embed(
+                    title="Invalid Message Type",
+                    description="Message type must be either `embed` or `text`.",
+                    color=0xff0000
+                )
+                await ctx.send(embed=embed)
+                return
+            
+        if len(value) > 100:
             embed = discord.Embed(
-                title="Invalid Language",
-                description=f"Currently supported languages: {', '.join(supported_languages)}\n[Contribute to add your own language!](https://github.com/vanillyn/vanillabot.py)",
+                title="Value Too Long",
+                description="Value must be 100 characters or less.",
                 color=0xff0000
             )
             await ctx.send(embed=embed)
             return
-
+        
         try:
-            set_user_config(ctx.author.id, 'language', language.lower())
+            set_user_config(ctx.author.id, key.lower(), value.lower())
             embed = discord.Embed(
-                title="Language Updated",
-                description=f"Your language has been set to `{language.lower()}`",
+                title="Configuration Updated",
+                description=f"Your `{key.lower()}` has been set to `{value.lower()}`",
                 color=0x00ff00
             )
             await ctx.send(embed=embed)
         except Exception as e:
             embed = discord.Embed(
                 title="Error",
-                description=f"Failed to update your language preference.\nError: {str(e)}",
+                description=f"Failed to update your preference.\nError: {str(e)}",
                 color=0xff0000
             )
             await ctx.send(embed=embed)

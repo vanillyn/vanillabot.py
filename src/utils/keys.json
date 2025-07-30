@@ -1,0 +1,4 @@
+{
+    "guild": ["prefix", "language", "welcomeChannel", "welcomeMessage", "leaveChannel", "leaveMessage", "modLogChannel"],
+    "user": ["language", "message_type"]
+}
