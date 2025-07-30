@@ -28,27 +28,30 @@
         "list_failure": "Failed to list autoresponders, somehow. Something must've gone wrong.",
         "invalid_name": "Invalid autoresponder name. It must be alphanumeric, and spaces aren't allowed.",
         "argument_missing": "Missing required argument `{arg}`.",
-        "no_autoresponders": "No autoresponders found.",
+        "no_autoresponders": "No autoresponders found in this server.",
         "already_exists": "Autoresponder `{name}` already exists.",
         "create_success": "`{name}` created successfully.",
         "edit_success": "`{name}` edited successfully.",
         "delete_success": "`{name}` deleted successfully.",
+        "language_added": "Language `{lang}` added successfully.",
+        "list_success": "All autoresponders in {guild}:",
+        "failure": "Failed to perform the action. Something went wrong, I guess.",
         "create": "Create",
         "edit": "Edit",
         "delete": "Delete",
         "list": "List",
+        "info": "Info on {name}",
+        "name": "Name",
+        "trigger": "Trigger",
+        "creator": "Creator",
+        "response": "Response",
+        "language": "Language",
         "cmds": {
             "create": "ar create <name> \"<trigger>\" \"<response>\" [language]",
             "edit": "ar edit <name> \"<response>\" [language]",
             "delete": "ar delete <name>",
             "list": "ar list",
             "info": "ar info <name>"
-        },
-        "info": {
-            "title": "Info on {name}",
-            "name": "Name",
-            "trigger": "Trigger",
-            "creator": "Creator"
         }
     }
 }

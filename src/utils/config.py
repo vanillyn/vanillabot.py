@@ -86,14 +86,14 @@ def set_guild_config(guild_id, key, value):
 
 def get_guild_config(guild_id, key):
     """get a configuration value for a guild"""
+    if key not in allowed_keys.get("guild", []):
+        raise ValueError(f"Invalid key: {key}. Allowed keys are: {allowed_keys['guild']}")
+    
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
         c.execute(
-            "SELECT ? FROM guild WHERE guild_id = ?",
-            (
-                key,
-                guild_id,
-            ),
+            f"SELECT {key} FROM guild WHERE guild_id = ?",
+            (guild_id,)
         )
         row = c.fetchone()
         return row[0] if row else None

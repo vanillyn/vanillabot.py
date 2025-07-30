@@ -3,7 +3,7 @@ from discord.ext import commands
 import sqlite3
 import re
 from typing import Optional, List, Tuple
-import src.utils.localization as tr
+from src.utils.localization import localization
 import src.utils.config as cfg
 
 DB_PATH = "config.db"
@@ -151,7 +151,7 @@ async def process_response(
     message: discord.Message, response: str
 ) -> Tuple[str, List[str]]:
     """processing placeholders in response"""
-    
+
     reactions = []
 
     react_pattern = r"\{react:(.*?)\}"
@@ -160,7 +160,7 @@ async def process_response(
         reactions.append(emoji)
 
     response = re.sub(react_pattern, "", response)
-    
+
     placeholders = {
         "{user}": message.author.mention,
         "{user_name}": message.author.name,
@@ -244,10 +244,10 @@ class AutoresponderCog(commands.Cog):
             return
 
         lang = cfg.get_user_config(user.id, "language") or "en"
-        msg = tr.languages.get(lang, {}).get("config", {})
+        msg = localization.languages.get(lang, {}).get("config", {})
         armsg = msg.get("ar", {})
         infomsg = armsg.get("info", {})
-        
+
         if reaction.message.id in self.ar_messages:
             ar_info = self.ar_messages[reaction.message.id]
 
@@ -257,12 +257,25 @@ class AutoresponderCog(commands.Cog):
 
             elif str(reaction.emoji) == "❓":
                 embed = discord.Embed(
-                    title=infomsg.get("title", "Autoresponder info").format(name=ar_info["name"]), color=discord.Color.blue()
+                    title=infomsg.get("title", "Autoresponder info").format(
+                        name=ar_info["name"]
+                    ),
+                    color=discord.Color.blue(),
                 )
-                embed.add_field(name=infomsg.get("name", "Name"), value=ar_info["name"], inline=False)
-                embed.add_field(name=infomsg.get("trigger", "Trigger"), value=ar_info["trigger"], inline=False)
                 embed.add_field(
-                    name=infomsg.get("creator", "Creator"), value=f"<@{ar_info['creator_id']}>", inline=False
+                    name=infomsg.get("name", "Name"),
+                    value=ar_info["name"],
+                    inline=False,
+                )
+                embed.add_field(
+                    name=infomsg.get("trigger", "Trigger"),
+                    value=ar_info["trigger"],
+                    inline=False,
+                )
+                embed.add_field(
+                    name=infomsg.get("creator", "Creator"),
+                    value=f"<@{ar_info['creator_id']}>",
+                    inline=False,
                 )
 
                 try:
@@ -274,11 +287,11 @@ class AutoresponderCog(commands.Cog):
     async def autoresponder(self, ctx):
         """command group for autoresponders"""
         lang = cfg.get_user_config(ctx.author.id, "language") or "en"
-        msg = tr.languages.get(lang, {}).get("config", {})
+        msg = localization.languages.get(lang, {}).get("config", {})
         armsg = msg.get("ar", {})
-        
+
         pfx = cfg.get_guild_config(ctx.guild.id, "prefix") or "y;"
-        
+
         embed = discord.Embed(
             title=armsg.get("title", "Autoresponders"),
             description=armsg.get("description", "Manage your autoresponders here."),
@@ -286,12 +299,24 @@ class AutoresponderCog(commands.Cog):
         )
         embed.add_field(
             name=armsg.get("create", "Create"),
-            value=f"{pfx}{armsg.get("cmds", {}).get("create", "ar create <name> \"<trigger>\" \"<response>\" [language]")}",
+            value=f"{pfx}{armsg.get('cmds', {}).get('create', 'ar create <name> "<trigger>" "<response>" [language]')}",
             inline=False,
         )
-        embed.add_field(name=armsg.get("edit", "Edit"), value=f"{pfx}{armsg.get("cmds", {}).get("edit", "ar edit <name> \"<response>\" [language]")}", inline=False)
-        embed.add_field(name=armsg.get("delete", "Delete"), value=f"{pfx}{armsg.get("cmds", {}).get("delete", "ar delete <name>")}", inline=False)
-        embed.add_field(name=armsg.get("list"), value=f"{pfx}{armsg.get("cmds", {}).get("list", "ar list")}", inline=False)
+        embed.add_field(
+            name=armsg.get("edit", "Edit"),
+            value=f"{pfx}{armsg.get('cmds', {}).get('edit', 'ar edit <name> "<response>" [language]')}",
+            inline=False,
+        )
+        embed.add_field(
+            name=armsg.get("delete", "Delete"),
+            value=f"{pfx}{armsg.get('cmds', {}).get('delete', 'ar delete <name>')}",
+            inline=False,
+        )
+        embed.add_field(
+            name=armsg.get("list"),
+            value=f"{pfx}{armsg.get('cmds', {}).get('list', 'ar list')}",
+            inline=False,
+        )
         await ctx.send(embed=embed)
 
     @autoresponder.command(name="create")
@@ -299,9 +324,16 @@ class AutoresponderCog(commands.Cog):
         self, ctx, name: str, trigger: str, response: str, language: str = "en"
     ):
         guild_id = str(ctx.guild.id)
+        lang = cfg.get_user_config(ctx.author.id, "language") or "en"
+        msg = localization.languages.get(lang, {}).get("config", {})
+        armsg = msg.get("ar", {})
 
         if autoresponder_exists(guild_id, name):
-            await ctx.send(f"Autoresponder `{name}` already exists!")
+            await ctx.send(
+                armsg.get(
+                    "already_exists", "Autoresponder {name} already exists."
+                ).format(name=name)
+            )
             return
 
         create_autoresponder(
@@ -309,13 +341,20 @@ class AutoresponderCog(commands.Cog):
         )
 
         embed = discord.Embed(
-            title="Autoresponder Created", color=discord.Color.green()
+            title=armsg.get("create_success", "Autoresponder created.").format(
+                name=name
+            ),
+            color=discord.Color.green(),
         )
-        embed.add_field(name="Name", value=name, inline=True)
-        embed.add_field(name="Trigger", value=trigger, inline=True)
-        embed.add_field(name="Language", value=language, inline=True)
+        embed.add_field(name=armsg.get("name", "Name"), value=name, inline=True)
         embed.add_field(
-            name="Response",
+            name=armsg.get("trigger", "Trigger"), value=trigger, inline=True
+        )
+        embed.add_field(
+            name=armsg.get("language", "Language"), value=language, inline=True
+        )
+        embed.add_field(
+            name=armsg.get("response", "Response"),
             value=response[:1000] + "..." if len(response) > 1000 else response,
             inline=False,
         )
@@ -326,18 +365,27 @@ class AutoresponderCog(commands.Cog):
     async def ar_edit(self, ctx, name: str, response: str, language: str = "en"):
         guild_id = str(ctx.guild.id)
 
+        lang = cfg.get_user_config(ctx.author.id, "language") or "en"
+        msg = localization.languages.get(lang, {}).get("config", {})
+        armsg = msg.get("ar", {})
+
         if not autoresponder_exists(guild_id, name):
-            await ctx.send(f"Autoresponder `{name}` not found!")
+            await ctx.send(
+                armsg.get("not_found", "{name} not found.").format(name=name)
+            )
             return
 
         if update_autoresponder(guild_id, name, response, language):
             embed = discord.Embed(
-                title="Autoresponder Updated", color=discord.Color.blue()
+                title=armsg.get("edit_success", "{name} modified.").format(name=name),
+                color=discord.Color.blue(),
             )
-            embed.add_field(name="Name", value=name, inline=True)
-            embed.add_field(name="Language", value=language, inline=True)
+            embed.add_field(name=armsg.get("name", "Name"), value=name, inline=True)
             embed.add_field(
-                name="New Response",
+                name=armsg.get("language", "Language"), value=language, inline=True
+            )
+            embed.add_field(
+                name=armsg.get("response", "Response"),
                 value=response[:1000] + "..." if len(response) > 1000 else response,
                 inline=False,
             )
@@ -355,12 +403,17 @@ class AutoresponderCog(commands.Cog):
                     language,
                 )
                 embed = discord.Embed(
-                    title="Autoresponder Language Added", color=discord.Color.green()
+                    title=armsg.get("language_added", "Added {lang}.").format(
+                        lang=language
+                    ),
+                    color=discord.Color.green(),
                 )
-                embed.add_field(name="Name", value=name, inline=True)
-                embed.add_field(name="Language", value=language, inline=True)
+                embed.add_field(name=armsg.get("name", "Name"), value=name, inline=True)
                 embed.add_field(
-                    name="Response",
+                    name=armsg.get("language", "Language"), value=language, inline=True
+                )
+                embed.add_field(
+                    name=armsg.get("response", "Response"),
                     value=response[:1000] + "..." if len(response) > 1000 else response,
                     inline=False,
                 )
@@ -370,23 +423,43 @@ class AutoresponderCog(commands.Cog):
     async def ar_delete(self, ctx, name: str):
         """Delete an autoresponder"""
         guild_id = str(ctx.guild.id)
+        lang = cfg.get_user_config(ctx.author.id, "language") or "en"
+        msg = localization.languages.get(lang, {}).get("config", {})
+        armsg = msg.get("ar", {})
 
         if delete_autoresponder(guild_id, name):
-            await ctx.send(f"Autoresponder `{name}` deleted!")
+            await ctx.send(
+                armsg.get("delete_success", "Autoresponder {name} deleted.").format(
+                    name=name
+                )
+            )
         else:
-            await ctx.send(f"Autoresponder `{name}` not found!")
+            await ctx.send(
+                armsg.get("not_found", "{name} not found.").format(name=name)
+            )
 
     @autoresponder.command(name="list")
     async def ar_list(self, ctx):
         guild_id = str(ctx.guild.id)
         autoresponders = get_all_autoresponders(guild_id)
 
+        lang = cfg.get_user_config(ctx.author.id, "language") or "en"
+        msg = localization.languages.get(lang, {}).get("config", {})
+        armsg = msg.get("ar", {})
+
         if not autoresponders:
-            await ctx.send("No autoresponders found in this server.")
+            await ctx.send(
+                armsg.get(
+                    "no_autoresponders", "No autoresponders found in this server."
+                )
+            )
             return
 
         embed = discord.Embed(
-            title=f"Autoresponders in {ctx.guild.name}", color=discord.Color.blue()
+            title=armsg.get("list_success", "Autoresponders in this server:").format(
+                guild=ctx.guild.name
+            ),
+            color=discord.Color.blue(),
         )
 
         grouped = {}
@@ -400,7 +473,7 @@ class AutoresponderCog(commands.Cog):
             languages = ", ".join(data["languages"])
             embed.add_field(
                 name=name,
-                value=f"Trigger: `{data['trigger']}`\nLanguages: {languages}",
+                value=f"{armsg.get('trigger', 'Trigger')}: `{data['trigger']}`\n{armsg.get('language', 'Languages')}: {languages}",
                 inline=False,
             )
 
@@ -410,12 +483,28 @@ class AutoresponderCog(commands.Cog):
     @ar_edit.error
     @ar_delete.error
     async def ar_error(self, ctx, error):
+        lang = cfg.get_user_config(ctx.author.id, "language") or "en"
+        msg = localization.languages.get(lang, {}).get("config", {})
+        armsg = msg.get("ar", {})
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Missing required argument: `{error.param.name}`")
+            await ctx.send(
+                armsg.get(
+                    "argument_missing", "Missing required argument `{arg}`."
+                ).format(arg=error.param.name)
+            )
         elif isinstance(error, commands.BadArgument):
-            await ctx.send("Invalid argument provided.")
+            await ctx.send(
+                armsg.get(
+                    "invalid_name",
+                    "Invalid autoresponder name. It must be alphanumeric, and spaces aren't allowed.",
+                )
+            )
         elif isinstance(error, commands.CommandInvokeError):
-            await ctx.send("An error occurred while processing your command.")
+            await ctx.send(
+                armsg.get(
+                    "failure", "Failed to perform the action. Something went wrong."
+                )
+            )
 
 
 async def setup(bot):
