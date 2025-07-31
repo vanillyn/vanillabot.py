@@ -183,7 +183,7 @@ class ConfigCog(commands.Cog):
         )
 
         if ctx.guild:
-            server_prefix = get_guild_config(ctx.guild.id, "prefix") or "y;"
+            server_prefix = get_guild_config(ctx.guild.id, "prefix") or "ly:"
             server_language = get_guild_config(ctx.guild.id, "language") or "en"
             embed.add_field(
                 name="Server Settings",
