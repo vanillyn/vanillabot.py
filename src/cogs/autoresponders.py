@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
 import sqlite3
-import re
-from typing import Optional, List, Tuple
+from typing import Optional, List
+
 from src.utils.localization import localization
+from src.utils.placeholders import pl
 import src.utils.config as cfg
 
 DB_PATH = "config.db"
@@ -139,61 +140,6 @@ def autoresponder_exists(guild_id: str, name: str) -> bool:
         return c.fetchone() is not None
 
 
-def ordinal(n: int):
-    if 11 <= (n % 100) <= 13:
-        suffix = "th"
-    else:
-        suffix = ["th", "st", "nd", "rd", "th"][min(n % 10, 4)]
-    return str(n) + suffix
-
-
-async def process_response(
-    message: discord.Message, response: str
-) -> Tuple[str, List[str]]:
-    """processing placeholders in response"""
-
-    reactions = []
-
-    react_pattern = r"\{react:(.*?)\}"
-    reactions_found = re.findall(react_pattern, response)
-    for emoji in reactions_found:
-        reactions.append(emoji)
-
-    response = re.sub(react_pattern, "", response)
-
-    placeholders = {
-        "{user}": message.author.mention,
-        "{user_name}": message.author.name,
-        "{user_id}": str(message.author.id),
-        "{user_join_date}": discord.utils.format_dt(message.author.joined_at, "F"),
-        "{user_creation_date}": discord.utils.format_dt(message.author.created_at, "F"),
-        "{top_role}": message.author.top_role.name,
-        "{mention_name}": message.mentions[0].name if message.mentions else "[user]",
-        "{mention_id}": str(message.mentions[0].id) if message.mentions else "[0000]",
-        "{mention_join_date}": discord.utils.format_dt(
-            message.mentions[0].joined_at, "F"
-        )
-        if message.mentions
-        else "[00-00-0000]",
-        "{member_count_ordinal}": ordinal(message.guild.member_count),
-        "{member_count}": str(message.guild.member_count),
-        "{channel}": message.channel.mention,
-        "{channel_name}": message.channel.name,
-        "{server_name}": message.guild.name,
-        "{server_id}": str(message.guild.id),
-        "{server_creation_date}": discord.utils.format_dt(
-            message.guild.created_at, "F"
-        ),
-        "{time}": discord.utils.format_dt(message.created_at, "F"),
-        "{date}": discord.utils.format_dt(message.created_at, "d"),
-    }
-
-    for placeholder, value in placeholders.items():
-        response = response.replace(placeholder, value)
-
-    return response.strip(), reactions
-
-
 class AutoresponderCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -218,7 +164,7 @@ class AutoresponderCog(commands.Cog):
                 response = ar_data["response"]
 
                 if response:
-                    processed_response, reactions = await process_response(
+                    processed_response, reactions = await pl(
                         message, response
                     )
 
