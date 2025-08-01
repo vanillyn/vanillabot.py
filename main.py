@@ -18,9 +18,8 @@ intents.members = True
 async def get_prefix(bot, message):
     guild_id = message.guild.id if message.guild else None
     prefix = get_guild_config(guild_id, "prefix")
-    prefix_str = str(prefix)
-    if prefix_str in message.content and os.getenv('ENVIRONMENT') == "DEVELOPMENT":
-        print(f"Command ran. {message.content}, in {message.guild.name}. This is for debugging and should be removed if environment is in production.")
+    if str(prefix) in message.content and os.getenv('ENVIRONMENT') == "DEVELOPMENT":
+        print(f"Command ran '{message.content}' in {message.guild.name}. This is for debugging and should be removed if environment is in production.")
     return commands.when_mentioned_or(prefix or "ly:")(bot, message)
 
 bot = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
