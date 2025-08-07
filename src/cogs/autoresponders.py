@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3
+import asyncio
 from typing import Optional, List
 
 from src.utils.localization import localization
@@ -161,15 +162,24 @@ class AutoresponderCog(commands.Cog):
             content = message.content.lower()
 
             if trigger in content:
-                response = ar_data["response"]
+                data = ar_data["response"]
 
-                if response:
-                    processed_response, reactions = await pl(
-                        message, response
+                if data:
+                    response, reactions = await pl(
+                        message, data
                     )
 
-                    if processed_response:
-                        sent_message = await message.channel.send(processed_response)
+                    if response:
+                        sent_message = await message.channel.send(content=response["text"], embed=response.get("embed"), view=response.get("view"))
+                        for reaction in response["reactions"]:
+                            try:
+                                await sent_message.add_reaction(reaction)
+                            except discord.HTTPException:
+                                pass
+                        if response.get("delete_after"):
+                            await asyncio.sleep(response["delete_after"])
+                            await sent_message.delete()
+                        
                         self.ar_messages[sent_message.id] = {
                             "name": ar_data["name"],
                             "creator_id": ar_data["creator_id"],
@@ -196,7 +206,7 @@ class AutoresponderCog(commands.Cog):
         if reaction.message.id in self.ar_messages:
             ar_info = self.ar_messages[reaction.message.id]
 
-            if str(reaction.emoji) in ["❌", "🗑️"]:
+            if str(reaction.emoji) in ["🗑️"]:
                 await reaction.message.delete()
                 del self.ar_messages[reaction.message.id]
 

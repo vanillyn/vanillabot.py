@@ -26,7 +26,7 @@ class Wiki(commands.Cog):
         if user.bot:
             return
         if reaction.message.author.bot:
-            if str(reaction.emoji) in ["❌", "🗑️"]:
+            if str(reaction.emoji) in ["❌"]:
                 await reaction.message.delete()
 
     @commands.command(name="wiki")

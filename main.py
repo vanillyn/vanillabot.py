@@ -41,6 +41,15 @@ async def setup_hook():
             except Exception as e:
                 print(f"Failed to load {cog}:", e)
 
+
+@commands.Cog.listener()
+async def on_reaction_add(self, reaction, user):
+    if user.bot:
+        return
+    if reaction.message.author.bot:
+        if str(reaction.emoji) in ["❌"]:
+            await reaction.message.delete()
+
 config.init_config()
 token = os.getenv("BOT_TOKEN")
 bot.run(token)
