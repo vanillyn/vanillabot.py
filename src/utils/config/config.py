@@ -30,5 +30,29 @@ def init_config():
                 message_type TEXT DEFAULT 'embed'
             )
         """)
+        # new server config columns, will be added if they dont exist in the existing db
+        try:
+            c.execute("ALTER TABLE guild ADD COLUMN autoresponder_edit_role INTEGER")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            c.execute("ALTER TABLE guild ADD COLUMN autoresponder_edit_permission TEXT DEFAULT 'send_messages'")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            c.execute("ALTER TABLE guild ADD COLUMN embed_edit_role INTEGER")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            c.execute("ALTER TABLE guild ADD COLUMN embed_edit_permission TEXT DEFAULT 'manage_server'")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            c.execute("ALTER TABLE guild ADD COLUMN server_config_role INTEGER")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            c.execute("ALTER TABLE guild ADD COLUMN staff_role INTEGER")
+        except sqlite3.OperationalError:
+            pass
         conn.commit()
-

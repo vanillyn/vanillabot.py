@@ -1,4 +1,18 @@
 {
-    "guild": ["prefix", "language", "welcomeChannel", "welcomeMessage", "leaveChannel", "leaveMessage", "modLogChannel"],
-    "user": ["language", "message_type"]
+  "guild": [
+    "prefix",
+    "language",
+    "welcomeChannel",
+    "welcomeMessage",
+    "leaveChannel",
+    "leaveMessage",
+    "modLogChannel",
+    "autoresponder_edit_role",
+    "autoresponder_edit_permission",
+    "embed_edit_role",
+    "embed_edit_permission",
+    "server_config_role",
+    "staff_role"
+  ],
+  "user": ["language", "message_type"]
 }

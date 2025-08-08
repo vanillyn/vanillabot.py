@@ -2,12 +2,13 @@ import sqlite3
 import dotenv
 import os
 
+
 dotenv.load_dotenv()
 db_path = os.getenv("DB_PATH", "db")
 EMBED_DB = f"{db_path}/embeds.db"
 
 def init_embeds():
-    """initializes the embeds database"""
+    """Initializes the embeds database"""
     with sqlite3.connect(EMBED_DB) as conn:
         c = conn.cursor()
         c.execute("""
@@ -15,7 +16,13 @@ def init_embeds():
                 guild_id INTEGER,
                 name TEXT,
                 embed TEXT,
-                PRIMARY KEY (guild_id, name)
+                language TEXT DEFAULT 'en',
+                creator_id INTEGER,
+                editors TEXT DEFAULT '',
+                contributors TEXT DEFAULT '',
+                editor_role INTEGER,
+                edit_permissions TEXT DEFAULT 'edit,delete,add_language',
+                PRIMARY KEY (guild_id, name, language)
             )
         """)
         conn.commit()

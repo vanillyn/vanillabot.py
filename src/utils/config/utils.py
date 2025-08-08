@@ -1,7 +1,6 @@
 import sqlite3
 import datetime as dt
 import json
-from typing import Optional, List
 from src.utils.config.init import allowed_keys
 from src.utils.config.autoresponders import AR_DB
 from src.utils.config.embeds import EMBED_DB
@@ -125,201 +124,173 @@ def get_notes(user_id):
         return c.fetchall()
     
 # embed management    
-def create_embed(guild_id, name, config_dict):
-    """create an embed"""
-    if not isinstance(guild_id, int):
-        raise ValueError("guild_id must be an integer")
-    if not isinstance(config_dict, dict):
-        raise ValueError("Embed config must be a dictionary")
-    
-    if len(json.dumps(config_dict)) > 6000:
-        raise ValueError("Embed configuration exceeds Discord's 6000 character limit")
-    if "fields" in config_dict and len(config_dict["fields"]) > 25:
-        raise ValueError("Embed cannot have more than 25 fields")
-    for field in config_dict.get("fields", []):
-        if len(field.get("name", "")) > 256:
-            raise ValueError("Field name exceeds 256 characters")
-        if len(field.get("value", "")) > 1024:
-            raise ValueError("Field value exceeds 1024 characters")
-    if "title" in config_dict and len(config_dict["title"]) > 256:
-        raise ValueError("Title exceeds 256 characters")
-    if "description" in config_dict and len(config_dict["description"]) > 4096:
-        raise ValueError("Description exceeds 4096 characters")
-    if "footer" in config_dict and len(config_dict["footer"].get("text", "")) > 2048:
-        raise ValueError("Footer text exceeds 2048 characters")
-    if "author" in config_dict and len(config_dict["author"].get("name", "")) > 256:
-        raise ValueError("Author name exceeds 256 characters")
-    
+
+def create_embed(guild_id, name, embed_config, language, creator_id, editors='', contributors='', editor_role=None, edit_permissions='edit,delete,add_language'):
+    """Create a new embed"""
     with sqlite3.connect(EMBED_DB) as conn:
         c = conn.cursor()
         c.execute("""
-            INSERT INTO embeds (guild_id, name, embed)
-            VALUES (?, ?, ?)
-            ON CONFLICT(guild_id, name) DO UPDATE SET
-                embed = excluded.embed
-        """, (guild_id, name, json.dumps(config_dict)))
+            INSERT INTO embeds (guild_id, name, embed, language, creator_id, editors, contributors, editor_role, edit_permissions)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (guild_id, name, json.dumps(embed_config), language, creator_id, editors, contributors, editor_role, edit_permissions))
         conn.commit()
 
-def get_embed(guild_id, name):
-    """get a single embed"""
+def update_embed(guild_id, name, language, embed_config=None, **kwargs):
+    """Update an existing embed"""
     with sqlite3.connect(EMBED_DB) as conn:
         c = conn.cursor()
-        c.execute(
-            "SELECT embed FROM embeds WHERE guild_id = ? AND name = ?",
-            (guild_id, name)
-        )
-        row = c.fetchone()
-        return json.loads(row[0]) if row else None
+        fields = []
+        values = []
+        if embed_config is not None:
+            fields.append("embed=?")
+            values.append(json.dumps(embed_config))
+        for key, value in kwargs.items():
+            fields.append(f"{key}=?")
+            values.append(value)
+        fields_str = ', '.join(fields)
+        values += [guild_id, name, language]
+        c.execute(f"""
+            UPDATE embeds SET {fields_str}
+            WHERE guild_id=? AND name=? AND language=?
+        """, values)
+        updated = c.rowcount > 0
+        conn.commit()
+        return updated
 
 def delete_embed(guild_id, name):
-    """delete an embed"""
+    """Delete an embed (all languages)"""
     with sqlite3.connect(EMBED_DB) as conn:
         c = conn.cursor()
-        c.execute(
-            "DELETE FROM embeds WHERE guild_id = ? AND name = ?",
-            (guild_id, name)
-        )
+        c.execute("DELETE FROM embeds WHERE guild_id=? AND name=?", (guild_id, name))
+        deleted = c.rowcount > 0
         conn.commit()
-        return c.rowcount > 0
+        return deleted
+
+def get_embed(guild_id, name, language):
+    """Get an embed for a specific language"""
+    with sqlite3.connect(EMBED_DB) as conn:
+        c = conn.cursor()
+        c.execute("""
+            SELECT guild_id, name, embed, language, creator_id, editors, contributors, editor_role, edit_permissions
+            FROM embeds WHERE guild_id=? AND name=? AND language=?
+        """, (guild_id, name, language))
+        row = c.fetchone()
+        if row:
+            return {
+                'guild_id': row[0],
+                'name': row[1],
+                'embed': json.loads(row[2]),
+                'language': row[3],
+                'creator_id': row[4],
+                'editors': row[5],
+                'contributors': row[6],
+                'editor_role': row[7],
+                'edit_permissions': row[8]
+            }
+        return None
 
 def get_all_embeds(guild_id):
-    """get all embeds for a guild"""
+    """Get all embeds for a guild"""
     with sqlite3.connect(EMBED_DB) as conn:
         c = conn.cursor()
-        c.execute(
-            "SELECT name, embed FROM embeds WHERE guild_id = ?",
-            (guild_id,)
-        )
-        return c.fetchall()
+        c.execute("""
+            SELECT guild_id, name, embed, language, creator_id, editors, contributors, editor_role, edit_permissions
+            FROM embeds WHERE guild_id=?
+        """, (guild_id,))
+        rows = c.fetchall()
+        return [{
+            'guild_id': row[0],
+            'name': row[1],
+            'embed': json.loads(row[2]),
+            'language': row[3],
+            'creator_id': row[4],
+            'editors': row[5],
+            'contributors': row[6],
+            'editor_role': row[7],
+            'edit_permissions': row[8]
+        } for row in rows]
     
 # autoresponder management
 
-def create_autoresponder(
-    guild_id: str,
-    name: str,
-    trigger: str,
-    response: str,
-    creator_id: str,
-    language: str = "en",
-):
+def create_autoresponder(guild_id, name, trigger, response, creator_id, language, editors='', contributors='', editor_role=None, edit_permissions='edit,delete,add_language', arguments='none'):
+    """Create a new autoresponder"""
     with sqlite3.connect(AR_DB) as conn:
         c = conn.cursor()
-        c.execute(
-            """
-            INSERT OR REPLACE INTO autoresponders 
-            (guild_id, name, trigger, response, language, creator_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """,
-            (guild_id, name, trigger, response, language, creator_id),
-        )
+        c.execute("""
+            INSERT INTO autoresponders (guild_id, name, trigger, response, language, creator_id, editors, contributors, editor_role, edit_permissions, arguments)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (guild_id, name, trigger, response, language, creator_id, editors, contributors, editor_role, edit_permissions, arguments))
         conn.commit()
 
-
-def get_autoresponder(guild_id: str, name: str, language: str = "en") -> Optional[dict]:
+def update_autoresponder(guild_id, name, language, **kwargs):
+    """Update an existing autoresponder"""
     with sqlite3.connect(AR_DB) as conn:
         c = conn.cursor()
-        c.execute(
-            """
-            SELECT trigger, response, creator_id 
-            FROM autoresponders 
-            WHERE guild_id = ? AND name = ? AND language = ?
-        """,
-            (guild_id, name, language),
-        )
-        row = c.fetchone()
-        if row:
-            return {"trigger": row[0], "response": row[1], "creator_id": row[2]}
-        return None
-
-
-def get_all_autoresponders(guild_id: str) -> List[dict]:
-    with sqlite3.connect(AR_DB) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            SELECT name, trigger, response, language, creator_id
-            FROM autoresponders 
-            WHERE guild_id = ?
-            ORDER BY name, language
-        """,
-            (guild_id,),
-        )
-        rows = c.fetchall()
-        return [
-            {
-                "name": row[0],
-                "trigger": row[1],
-                "response": row[2],
-                "language": row[3],
-                "creator_id": row[4],
-            }
-            for row in rows
-        ]
-
-
-def get_guild_triggers(guild_id: str) -> List[dict]:
-    with sqlite3.connect(AR_DB) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            SELECT name, trigger, response, language, creator_id
-            FROM autoresponders 
-            WHERE guild_id = ?
-        """,
-            (guild_id,),
-        )
-        rows = c.fetchall()
-        return [
-            {
-                "name": row[0],
-                "trigger": row[1],
-                "response": row[2],
-                "language": row[3],
-                "creator_id": row[4],
-            }
-            for row in rows
-        ]
-
-
-def update_autoresponder(guild_id: str, name: str, response: str, language: str = "en"):
-    """update an existing autoresponder response"""
-    with sqlite3.connect(AR_DB) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            UPDATE autoresponders 
-            SET response = ?
-            WHERE guild_id = ? AND name = ? AND language = ?
-        """,
-            (response, guild_id, name, language),
-        )
+        fields = ', '.join(f"{key}=?" for key in kwargs)
+        values = list(kwargs.values()) + [guild_id, name, language]
+        c.execute(f"""
+            UPDATE autoresponders SET {fields}
+            WHERE guild_id=? AND name=? AND language=?
+        """, values)
+        updated = c.rowcount > 0
         conn.commit()
-        return c.rowcount > 0
+        return updated
 
-
-def delete_autoresponder(guild_id: str, name: str) -> bool:
+def delete_autoresponder(guild_id, name):
+    """Delete an autoresponder (all languages)"""
     with sqlite3.connect(AR_DB) as conn:
         c = conn.cursor()
-        c.execute(
-            """
-            DELETE FROM autoresponders 
-            WHERE guild_id = ? AND name = ?
-        """,
-            (guild_id, name),
-        )
+        c.execute("DELETE FROM autoresponders WHERE guild_id=? AND name=?", (guild_id, name))
+        deleted = c.rowcount > 0
         conn.commit()
-        return c.rowcount > 0
+        return deleted
 
-
-def autoresponder_exists(guild_id: str, name: str) -> bool:
+def autoresponder_exists(guild_id, name):
+    """Check if an autoresponder exists"""
     with sqlite3.connect(AR_DB) as conn:
         c = conn.cursor()
-        c.execute(
-            """
-            SELECT 1 FROM autoresponders 
-            WHERE guild_id = ? AND name = ? LIMIT 1
-        """,
-            (guild_id, name),
-        )
+        c.execute("SELECT 1 FROM autoresponders WHERE guild_id=? AND name=?", (guild_id, name))
         return c.fetchone() is not None
 
+def get_autoresponder(guild_id, name, language):
+    """Get an autoresponder for a specific language"""
+    with sqlite3.connect(AR_DB) as conn:
+        c = conn.cursor()
+        c.execute("""
+            SELECT guild_id, name, trigger, response, language, creator_id, editors, contributors, editor_role, edit_permissions, arguments
+            FROM autoresponders WHERE guild_id=? AND name=? AND language=?
+        """, (guild_id, name, language))
+        row = c.fetchone()
+        if row:
+            return {
+                'guild_id': row[0], 'name': row[1], 'trigger': row[2], 'response': row[3],
+                'language': row[4], 'creator_id': row[5], 'editors': row[6], 'contributors': row[7],
+                'editor_role': row[8], 'edit_permissions': row[9], 'arguments': row[10]
+            }
+        return None
+
+def get_all_autoresponders(guild_id):
+    """Get all autoresponders for a guild"""
+    with sqlite3.connect(AR_DB) as conn:
+        c = conn.cursor()
+        c.execute("""
+            SELECT guild_id, name, trigger, response, language, creator_id, editors, contributors, editor_role, edit_permissions, arguments
+            FROM autoresponders WHERE guild_id=?
+        """, (guild_id,))
+        rows = c.fetchall()
+        return [{
+            'guild_id': row[0], 'name': row[1], 'trigger': row[2], 'response': row[3],
+            'language': row[4], 'creator_id': row[5], 'editors': row[6], 'contributors': row[7],
+            'editor_role': row[8], 'edit_permissions': row[9], 'arguments': row[10]
+        } for row in rows]
+
+def get_guild_triggers(guild_id):
+    """Get all triggers for a guild"""
+    with sqlite3.connect(AR_DB) as conn:
+        c = conn.cursor()
+        c.execute("""
+            SELECT DISTINCT name, trigger
+            FROM autoresponders WHERE guild_id=?
+        """, (guild_id,))
+        rows = c.fetchall()
+        return [{'name': row[0], 'trigger': row[1]} for row in rows]
