@@ -1,7 +1,7 @@
 import sqlite3
 import datetime as dt
 import json
-from src.utils.config.init import allowed_keys
+from src.utils.config import allowed_keys
 from src.utils.config.autoresponders import AR_DB
 from src.utils.config.embeds import EMBED_DB
 from src.utils.config.infractions import MOD_DB

@@ -18,6 +18,11 @@ def init_autoresponders():
                 response TEXT,
                 language TEXT DEFAULT 'en',
                 creator_id INTEGER,
+                editors TEXT DEFAULT '',
+                contributors TEXT DEFAULT '',
+                editor_role INTEGER,
+                edit_permissions TEXT DEFAULT 'edit,delete,add_language',
+                arguments TEXT DEFAULT 'none',
                 PRIMARY KEY (guild_id, name, language)
             )
         """)

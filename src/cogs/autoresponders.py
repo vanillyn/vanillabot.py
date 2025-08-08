@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import re
+from main import logger
 from src.utils.localization import localization
 from src.utils.placeholders import pl
 from src.utils.config.utils import get_guild_triggers, get_all_autoresponders, get_autoresponder, create_autoresponder, update_autoresponder, delete_autoresponder, autoresponder_exists
@@ -311,8 +312,7 @@ class AutoresponderCog(commands.Cog):
 
         guild_id = str(message.guild.id)
         user_lang = cfg.get_user_config(message.author.id, "language") or "en"
-        server_config = cfg.get_guild_config(guild_id)
-        server_lang = server_config.get('language', 'en')
+        server_lang = cfg.get_guild_config(guild_id, "language") or "en"
         triggers = get_guild_triggers(guild_id)
 
         for ar_data in triggers:
@@ -412,7 +412,7 @@ class AutoresponderCog(commands.Cog):
     async def autoresponder(self, ctx):
         """Command group for autoresponders"""
         lang = cfg.get_user_config(ctx.author.id, "language") or "en"
-        pfx = cfg.get_guild_config(ctx.guild.id, "prefix") or "y;"
+        pfx = cfg.get_guild_config(ctx.guild.id, "prefix") or " "
         embed = discord.Embed(
             title=localization.get("config", "ar.title", lang=lang),
             description=localization.get("config", "ar.description", lang=lang),
@@ -603,12 +603,16 @@ class AutoresponderCog(commands.Cog):
     async def ar_error(self, ctx, error):
         lang = cfg.get_user_config(ctx.author.id, "language") or "en"
         if isinstance(error, commands.MissingRequiredArgument):
+            logger.error(f"Missing argument in autoresponder command: {error.param.name} for {ctx.command.name} in guild {ctx.guild.id}")
             await ctx.send(localization.get("config", "ar.argument_missing", lang=lang, arg=error.param.name))
         elif isinstance(error, commands.BadArgument):
+            logger.error(f"Invalid argument in autoresponder command: {error}")
             await ctx.send(localization.get("config", "ar.invalid_name", lang=lang))
         elif isinstance(error, commands.MissingPermissions):
+            logger.error(f"User {ctx.author.id} tried to use autoresponder command without permission in guild {ctx.guild.id}")
             await ctx.send(localization.get("config", "ar.no_permission", lang=lang))
         elif isinstance(error, commands.CommandInvokeError):
+            logger.error(f"Error in autoresponder command: {error.original}")
             await ctx.send(localization.get("config", "ar.failure", lang=lang))
 
 async def setup(bot):

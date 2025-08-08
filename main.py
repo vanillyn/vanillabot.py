@@ -1,11 +1,30 @@
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+import logging
+import sys
 import os
-import src.utils.config.init as db
+import src.utils.config as db
 
 from src.utils.localization import localization
 from src.utils.config.utils import get_guild_config
+name = os.getenv("NAME", "berrylyn")
+env = os.getenv("ENVIRONMENT", "DEVELOPMENT")
+
+logfile = logging.FileHandler(f'{name}.log')
+stdout = logging.StreamHandler(sys.stdout)
+logger = logging.getLogger("discord")
+logger.addHandler(logfile)
+logger.addHandler(stdout)
+
+
+if env == "DEVELOPMENT":
+    logger.setLevel(logging.DEBUG)
+    logger.info(f"Running in {env}. Debugging enabled.")
+else:
+    level = logging.ERROR
+    logger.info(f"Running in {env}.")
+
 
 load_dotenv()
 localization.load_languages()
@@ -18,9 +37,11 @@ intents.members = True
 async def get_prefix(bot, message):
     guild_id = message.guild.id if message.guild else None
     prefix = get_guild_config(guild_id, "prefix")
-    if str(prefix) in message.content and os.getenv('ENVIRONMENT') == "DEVELOPMENT":
-        print(f"Command ran '{message.content}' in {message.guild.name}. This is for debugging and should be removed if environment is in production.")
+    if str(prefix) in message.content and env == "DEVELOPMENT":
+        logger.debug(f"Command ran '{message.content}' in {message.guild.name}. This is for debugging and should be removed if environment is in production.")
     return commands.when_mentioned_or(prefix or "ly:")(bot, message)
+
+
 
 bot = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None)
 
@@ -28,7 +49,7 @@ bot = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None
 
 @bot.event
 async def on_ready():
-    print(f"{os.getenv('NAME', 'bot')} loaded. {bot.user}")
+    logger.info(f"{os.getenv('NAME', 'bot')} loaded. {bot.user}")
 
 
 @bot.event
@@ -37,9 +58,9 @@ async def setup_hook():
         if cog.endswith(".py") and not cog.startswith("__"):
             try:
                 await bot.load_extension(f"src.cogs.{cog[:-3]}")
-                print(f"Loaded {cog}")
+                logger.info(f"Loaded {cog}")
             except Exception as e:
-                print(f"Failed to load {cog}:", e)
+                logger.error(f"Failed to load {cog}:", e)
 
 
 @commands.Cog.listener()
@@ -52,4 +73,4 @@ async def on_reaction_add(self, reaction, user):
 
 db.init()
 token = os.getenv("BOT_TOKEN")
-bot.run(token)
+bot.run(token, log_handler=stdout)
