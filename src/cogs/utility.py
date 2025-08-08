@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from src.utils.localization import localization
-import src.utils.config as config
+import src.utils.config.utils as db
 
 
 class Utility(commands.Cog):
@@ -11,15 +11,15 @@ class Utility(commands.Cog):
     @commands.command(name="help")
     async def help(self, ctx, *args):
         """display help information for commands"""
-        lang = config.get_user_config(ctx.author.id, "language") or "en"
-        message_type = config.get_user_config(ctx.author.id, "message_type") or "embed"
+        lang = db.get_user_config(ctx.author.id, "language") or "en"
+        message_type = db.get_user_config(ctx.author.id, "message_type") or "embed"
         print(f"Getting help for: {lang}")
 
         if args and args[-1] in localization.languages:
             lang = args[-1]
             args = args[:-1]
         if ctx.guild:
-            prefix = config.get_guild_config(ctx.guild.id, "prefix") or "y;"
+            prefix = db.get_guild_config(ctx.guild.id, "prefix") or "y;"
         else:
             prefix = "y;"
 
@@ -107,7 +107,7 @@ class Utility(commands.Cog):
     async def ping(self, ctx, arg=None):
         """check the bots response time"""
         langs = ", ".join(localization.languages.keys())
-        lang = config.get_user_config(ctx.author.id, "language")
+        lang = db.get_user_config(ctx.author.id, "language")
         channel = ctx.channel
         if arg:
             if arg in langs:

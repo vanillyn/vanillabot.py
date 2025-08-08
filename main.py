@@ -2,10 +2,10 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
-import src.utils.config as config
+import src.utils.config.init as db
 
 from src.utils.localization import localization
-from src.utils.config import get_guild_config
+from src.utils.config.utils import get_guild_config
 
 load_dotenv()
 localization.load_languages()
@@ -50,6 +50,6 @@ async def on_reaction_add(self, reaction, user):
         if str(reaction.emoji) in ["❌"]:
             await reaction.message.delete()
 
-config.init_config()
+db.init()
 token = os.getenv("BOT_TOKEN")
 bot.run(token)

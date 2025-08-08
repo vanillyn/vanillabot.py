@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import wikipediaapi
-from src.utils import config
+from src.utils.config import utils as db
 from src.utils.localization import localization
 
 TOPICS = [
@@ -33,8 +33,8 @@ class Wiki(commands.Cog):
     @commands.has_permissions(embed_links=True)
     async def wiki(self, ctx, *, query):
         user_id = ctx.author.id
-        lang = config.get_user_config(user_id, "language") or "en"
-        msg_type = config.get_user_config(user_id, "message_type") or "embed"
+        lang = db.get_user_config(user_id, "language") or "en"
+        msg_type = db.get_user_config(user_id, "message_type") or "embed"
         msg = localization.languages.get(lang, {}).get("wiki", {})
 
         wiki = wikipediaapi.Wikipedia(

@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from datetime import timedelta
 from src.utils.localization import localization
-import src.utils.config as config
+import src.utils.config.utils as db
 
 
 class Moderation(commands.Cog):
@@ -13,7 +13,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def warn(self, ctx, member: discord.Member, *, reason=None):
         """issues a warning"""
-        lang = config.get_language(ctx.author.id, ctx.guild.id)
+        lang = db.get_language(ctx.author.id, ctx.guild.id)
         messages = localization.languages.get(lang, {}).get("moderation", {})
         warn = messages.get("warn")
 
@@ -25,7 +25,7 @@ class Moderation(commands.Cog):
             ctx.send(warn.get("no_user", "[lang error] No user specified."))
             return
         try:
-            config.add_infraction(
+            db.add_infraction(
                 ctx.guild.id, member.id, "warn", reason, None, ctx.author.id
             )
             await member.send(
@@ -59,7 +59,7 @@ class Moderation(commands.Cog):
         note=None,
     ):
         """adds a note to a user"""
-        lang = config.get_language(ctx.author.id, ctx.guild.id)
+        lang = db.get_language(ctx.author.id, ctx.guild.id)
         messages = localization.languages.get(lang, {}).get("moderation", {})
         notem = messages.get("note", {})
 
@@ -85,7 +85,7 @@ class Moderation(commands.Cog):
             await ctx.send("global notes arent implemented yet.")
             # config.add_note(member.id, note, ctx.author.id)
         else:
-            config.add_infraction(
+            db.add_infraction(
                 ctx.guild.id, member.id, "note", note, None, ctx.author.id
             )
 
@@ -101,7 +101,7 @@ class Moderation(commands.Cog):
         self, ctx, member: discord.Member, duration: str = None, *, reason=None
     ):
         """bans a user"""
-        lang = config.get_language(ctx.author.id, ctx.guild.id)
+        lang = db.get_language(ctx.author.id, ctx.guild.id)
         messages = localization.languages.get(lang, {}).get("moderation", {})
         ban_msg = messages.get("ban", {})
 
@@ -151,7 +151,7 @@ class Moderation(commands.Cog):
                 )
                 return
             await member.ban(reason=reason)
-            config.add_infraction(
+            db.add_infraction(
                 ctx.guild.id, member.id, "ban", reason, delta, ctx.author.id
             )
             await ctx.send(
@@ -183,7 +183,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason=None):
         """kicks a user"""
-        lang = config.get_language(ctx.author.id, ctx.guild.id)
+        lang = db.get_language(ctx.author.id, ctx.guild.id)
         messages = localization.languages.get(lang, {}).get("moderation", {})
         kick_msg = messages.get("kick", {})
 
@@ -206,7 +206,7 @@ class Moderation(commands.Cog):
                     ).format(user=member.mention)
                 )
             await member.kick(reason=reason)
-            config.add_infraction(
+            db.add_infraction(
                 ctx.guild.id, member.id, "kick", reason, None, ctx.author.id
             )
             await ctx.send(
@@ -233,7 +233,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(ban_members=True)
     async def unban(self, ctx, user_id: int, *, reason=None):
         """unbans a user"""
-        lang = config.get_language(ctx.author.id, ctx.guild.id)
+        lang = db.get_language(ctx.author.id, ctx.guild.id)
         messages = localization.languages.get(lang, {}).get("moderation", {})
         unban_msg = messages.get("unban", {})
 
@@ -250,7 +250,7 @@ class Moderation(commands.Cog):
                 return
 
             await ctx.guild.unban(user, reason=reason)
-            config.add_infraction(
+            db.add_infraction(
                 ctx.guild.id, user.id, "unban", reason, None, ctx.author.id
             )
             await ctx.send(
@@ -300,7 +300,7 @@ class Moderation(commands.Cog):
             inline=False,
         )
 
-        infractions = config.get_infractions(ctx.guild.id, member.id)
+        infractions = db.get_infractions(ctx.guild.id, member.id)
 
         if infractions:
             infraction_list = "\n".join(
@@ -312,7 +312,7 @@ class Moderation(commands.Cog):
                 name="Infractions", value="No infractions found.", inline=False
             )
 
-        notes = config.get_notes(member.id)
+        notes = db.get_notes(member.id)
         if notes:
             note_list = "\n".join(
                 [f"{note[0]} (by <@{note[1]}> on {note[2]})" for note in notes]
@@ -327,7 +327,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(moderate_members=True)
     async def timeout(self, ctx, member: discord.Member, duration: str, *, reason=None):
         """times out a user"""
-        lang = config.get_language(ctx.author.id, ctx.guild.id)
+        lang = db.get_language(ctx.author.id, ctx.guild.id)
         messages = localization.languages.get(lang, {}).get("moderation", {})
         timeout_msg = messages.get("timeout", {})
 

@@ -1,145 +1,11 @@
 import discord
 from discord.ext import commands
-import sqlite3
 import asyncio
-from typing import Optional, List
 
 from src.utils.localization import localization
 from src.utils.placeholders import pl
-import src.utils.config as cfg
-
-DB_PATH = "config.db"
-
-
-def create_autoresponder(
-    guild_id: str,
-    name: str,
-    trigger: str,
-    response: str,
-    creator_id: str,
-    language: str = "en",
-):
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            INSERT OR REPLACE INTO autoresponders 
-            (guild_id, name, trigger, response, language, creator_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """,
-            (guild_id, name, trigger, response, language, creator_id),
-        )
-        conn.commit()
-
-
-def get_autoresponder(guild_id: str, name: str, language: str = "en") -> Optional[dict]:
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            SELECT trigger, response, creator_id 
-            FROM autoresponders 
-            WHERE guild_id = ? AND name = ? AND language = ?
-        """,
-            (guild_id, name, language),
-        )
-        row = c.fetchone()
-        if row:
-            return {"trigger": row[0], "response": row[1], "creator_id": row[2]}
-        return None
-
-
-def get_all_autoresponders(guild_id: str) -> List[dict]:
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            SELECT name, trigger, response, language, creator_id
-            FROM autoresponders 
-            WHERE guild_id = ?
-            ORDER BY name, language
-        """,
-            (guild_id,),
-        )
-        rows = c.fetchall()
-        return [
-            {
-                "name": row[0],
-                "trigger": row[1],
-                "response": row[2],
-                "language": row[3],
-                "creator_id": row[4],
-            }
-            for row in rows
-        ]
-
-
-def get_guild_triggers(guild_id: str) -> List[dict]:
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            SELECT name, trigger, response, language, creator_id
-            FROM autoresponders 
-            WHERE guild_id = ?
-        """,
-            (guild_id,),
-        )
-        rows = c.fetchall()
-        return [
-            {
-                "name": row[0],
-                "trigger": row[1],
-                "response": row[2],
-                "language": row[3],
-                "creator_id": row[4],
-            }
-            for row in rows
-        ]
-
-
-def update_autoresponder(guild_id: str, name: str, response: str, language: str = "en"):
-    """update an existing autoresponder response"""
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            UPDATE autoresponders 
-            SET response = ?
-            WHERE guild_id = ? AND name = ? AND language = ?
-        """,
-            (response, guild_id, name, language),
-        )
-        conn.commit()
-        return c.rowcount > 0
-
-
-def delete_autoresponder(guild_id: str, name: str) -> bool:
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            DELETE FROM autoresponders 
-            WHERE guild_id = ? AND name = ?
-        """,
-            (guild_id, name),
-        )
-        conn.commit()
-        return c.rowcount > 0
-
-
-def autoresponder_exists(guild_id: str, name: str) -> bool:
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute(
-            """
-            SELECT 1 FROM autoresponders 
-            WHERE guild_id = ? AND name = ? LIMIT 1
-        """,
-            (guild_id, name),
-        )
-        return c.fetchone() is not None
-
+from src.utils.config.utils import get_guild_triggers, get_all_autoresponders, get_autoresponder, create_autoresponder, update_autoresponder, delete_autoresponder, autoresponder_exists
+import src.utils.config.utils as cfg
 
 class AutoresponderCog(commands.Cog):
     def __init__(self, bot):
@@ -171,11 +37,7 @@ class AutoresponderCog(commands.Cog):
 
                     if response:
                         sent_message = await message.channel.send(content=response["text"], embed=response.get("embed"), view=response.get("view"))
-                        for reaction in response["reactions"]:
-                            try:
-                                await sent_message.add_reaction(reaction)
-                            except discord.HTTPException:
-                                pass
+
                         if response.get("delete_after"):
                             await asyncio.sleep(response["delete_after"])
                             await sent_message.delete()

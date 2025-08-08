@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from src.utils.config import (
+from src.utils.config.utils import (
     set_guild_config,
     get_guild_config,
     set_user_config,
