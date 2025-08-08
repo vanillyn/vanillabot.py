@@ -7,11 +7,6 @@ from src.utils.placeholders import pl
 from src.utils.localization import localization
 from src.utils.config import utils as db
 import src.utils.config.utils as cfg
-import logging
-
-# Set up logging
-logging.basicConfig(level=logging.INFO, filename="bot.log", format="%(asctime)s %(levelname)s %(name)s: %(message)s")
-logger = logging.getLogger(__name__)
 
 class ModalBasic(discord.ui.Modal):
     def __init__(self, embed_name, embed_config, message, lang):
@@ -81,7 +76,7 @@ class ModalBasic(discord.ui.Modal):
             await self.message.edit(embed=embed)
             await interaction.response.send_message(localization.get("config", "embed.edit_success", lang=self.lang, name=self.embed_name), ephemeral=True, view=BuilderView(self.embed_name, self.embed_config, self.message, self.lang))
         except Exception as e:
-            logger.error(f"Failed to process basic modal: {e}")
+            print(f"Failed to process basic modal: {e}")
             await interaction.response.send_message(localization.get("config", "embed.error_save", lang=self.lang), ephemeral=True)
 
     async def build_embed(self, interaction: discord.Interaction):
@@ -196,7 +191,7 @@ class ModalAdvanced(discord.ui.Modal):
             await self.message.edit(embed=embed)
             await interaction.response.send_message(localization.get("config", "embed.edit_success", lang=self.lang, name=self.embed_name), ephemeral=True, view=BuilderView(self.embed_name, self.embed_config, self.message, self.lang))
         except Exception as e:
-            logger.error(f"Failed to process advanced modal: {e}")
+            print(f"Failed to process advanced modal: {e}")
             await interaction.response.send_message(localization.get("config", "embed.error_save", lang=self.lang), ephemeral=True)
 
 class ModalField(discord.ui.Modal):
@@ -249,7 +244,7 @@ class ModalField(discord.ui.Modal):
             await self.message.edit(embed=embed)
             await interaction.response.send_message(localization.get("config", "embed.edit_success", lang=self.lang, name=self.embed_name), ephemeral=True, view=BuilderView(self.embed_name, self.embed_config, self.message, self.lang))
         except Exception as e:
-            logger.error(f"Failed to process field modal: {e}")
+            print(f"Failed to process field modal: {e}")
             await interaction.response.send_message(localization.get("config", "embed.error_save", lang=self.lang), ephemeral=True)
 
 class BuilderView(discord.ui.View):
@@ -387,7 +382,7 @@ class BuilderView(discord.ui.View):
             await self.message.edit(embed=embed, view=None)
             await interaction.response.send_message(localization.get("config", "embed.create_success", lang=self.lang, name=self.embed_name), ephemeral=True)
         except Exception as e:
-            logger.error(f"Failed to save embed: {e}")
+            print(f"Failed to save embed: {e}")
             await interaction.response.send_message(localization.get("config", "embed.error_save", lang=self.lang), ephemeral=True)
 
     async def create_edit_embed(self, user, embed_data):
