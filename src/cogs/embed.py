@@ -519,7 +519,7 @@ class EmbedCog(commands.Cog):
         if not name.isalnum():
             await ctx.send(localization.get("config", "embed.invalid_name", lang=lang), ephemeral=True)
             return
-        if db.get_embed(ctx.guild.id, name, 'en'):  # Check for any language
+        if db.get_embed(ctx.guild.id, name, 'en'):
             await ctx.send(localization.get("config", "embed.already_exists", lang=lang, name=name), ephemeral=True)
             return
         await ctx.send(localization.get("config", "embed.create_prompt_language", lang=lang, name=name), ephemeral=True)
@@ -565,7 +565,7 @@ class EmbedCog(commands.Cog):
     async def delete(self, ctx: commands.Context, name: str):
         guild_id = str(ctx.guild.id)
         lang = cfg.get_user_config(ctx.author.id, "language") or "en"
-        embed_data = db.get_embed(guild_id, name, 'en')  # Check permissions with 'en' version
+        embed_data = db.get_embed(guild_id, name, 'en')
         if not embed_data:
             await ctx.send(localization.get("config", "embed.not_found", lang=lang, name=name), ephemeral=True)
             return

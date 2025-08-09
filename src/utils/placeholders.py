@@ -187,9 +187,10 @@ async def pl(message: discord.Message, text: str):
 
     if embed_name:
         try:
-            embed_config_data = db.get_embed(message.guild.id, embed_name)
+            embed_config_data = db.get_embed(message.guild.id, embed_name, db.get_language(message.author.id, message.guild.id)).get("embed")
             if embed_config_data:
                 embed_config_text = json.dumps(embed_config_data)
+                print(f"Original embed config: {embed_config_data}")
                 for key, val in placeholders.items():
                     embed_config_text = embed_config_text.replace(key, str(val))
                 if message.author.guild_permissions.manage_guild:
@@ -203,7 +204,7 @@ async def pl(message: discord.Message, text: str):
                 if embed_config_data.get("title"):
                     embed.title = embed_config_data["title"][:256]
                 if embed_config_data.get("description"):
-                    embed.description = embed_config_data["description"][:4096]
+                    embed.description = embed_config_data["description"][:4000]
                 if embed_config_data.get("color") is not None:
                     try:
                         if isinstance(embed_config_data["color"], int):
@@ -238,6 +239,7 @@ async def pl(message: discord.Message, text: str):
                         value=field["value"][:1024],
                         inline=field.get("inline", False)
                     )
+                print(f"Processed embed config: {embed}\nEmbed data: {embed.to_dict()}")
                 response["embed"] = embed
             else:
                 return f"Error: Embed '{embed_name}' not found.", []

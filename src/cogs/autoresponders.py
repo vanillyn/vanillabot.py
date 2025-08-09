@@ -2,13 +2,12 @@ import discord
 from discord.ext import commands
 import asyncio
 import re
-from main import logger
 from src.utils.localization import localization
 from src.utils.placeholders import pl
 from src.utils.config.utils import get_guild_triggers, get_all_autoresponders, get_autoresponder, create_autoresponder, update_autoresponder, delete_autoresponder, autoresponder_exists
 import src.utils.config.utils as cfg
 
-class AutoresponderEditView(discord.ui.View):
+class edit_view(discord.ui.View):
     def __init__(self, bot, ar_data, user_id, guild_id, language):
         super().__init__(timeout=300)
         self.bot = bot
@@ -20,9 +19,8 @@ class AutoresponderEditView(discord.ui.View):
     async def check_permissions(self, user, action):
         ar_data = self.ar_data
         guild = self.bot.get_guild(int(self.guild_id))
-        server_config = cfg.get_guild_config(self.guild_id)
-        edit_role = server_config.get('autoresponder_edit_role')
-        edit_perm = server_config.get('autoresponder_edit_permission', 'send_messages')
+        edit_role = cfg.get_guild_config(self.guild_id, 'autoresponder_edit_role')
+        edit_perm = cfg.get_guild_config(self.guild_id, 'autoresponder_edit_permission')
         editor_role = ar_data.get('editor_role')
         editors = ar_data.get('editors', '').split(',') if ar_data.get('editors') else []
         permissions = ar_data.get('edit_permissions', '').split(',') if ar_data.get('edit_permissions') else []
@@ -275,8 +273,7 @@ class AutoresponderCog(commands.Cog):
             r"\{channel_last_message\}",
         ]
         lang = cfg.get_user_config(user.id, "language") or "en"
-        server_config = cfg.get_guild_config(user.guild.id)
-        staff_role = server_config.get('staff_role')
+        staff_role = cfg.get_guild_config(user.guild.id, 'staff_role')
         for pattern in restricted_patterns:
             if re.search(pattern, response):
                 if not user.guild_permissions.manage_guild and not (staff_role and any(role.id == staff_role for role in user.roles)):
@@ -285,9 +282,8 @@ class AutoresponderCog(commands.Cog):
 
     async def check_permissions(self, user, guild_id, action, ar_data=None):
         """Check if user can perform action on autoresponder"""
-        server_config = cfg.get_guild_config(guild_id)
-        edit_role = server_config.get('autoresponder_edit_role')
-        edit_perm = server_config.get('autoresponder_edit_permission', 'send_messages')
+        edit_role = cfg.get_guild_config(guild_id, 'autoresponder_edit_role')
+        edit_perm = cfg.get_guild_config(guild_id, 'autoresponder_edit_permission')
         if edit_role and any(role.id == edit_role for role in user.roles):
             return True
         if getattr(user.guild_permissions, edit_perm, False):
@@ -311,8 +307,7 @@ class AutoresponderCog(commands.Cog):
             return
 
         guild_id = str(message.guild.id)
-        user_lang = cfg.get_user_config(message.author.id, "language") or "en"
-        server_lang = cfg.get_guild_config(guild_id, "language") or "en"
+        lang = cfg.get_language(message.author.id, guild_id) or "en"
         triggers = get_guild_triggers(guild_id)
 
         for ar_data in triggers:
@@ -321,16 +316,14 @@ class AutoresponderCog(commands.Cog):
 
             if trigger in content:
                 ar_name = ar_data["name"]
-                ar_data_user_lang = get_autoresponder(guild_id, ar_name, user_lang)
-                ar_data_server_lang = get_autoresponder(guild_id, ar_name, server_lang)
+                ar_data_lang = get_autoresponder(guild_id, ar_name, lang)
                 ar_data_en = get_autoresponder(guild_id, ar_name, "en")
 
-                # Prioritize user language, then server language, then English
-                selected_data = ar_data_user_lang or ar_data_server_lang or ar_data_en
+                selected_data = ar_data_lang or ar_data_en
                 if not selected_data:
                     continue
 
-                # Check arguments
+
                 arguments = selected_data.get('arguments', 'none')
                 if arguments == 'user' and not re.search(r"<@!?(\d+)>", message.content):
                     continue
@@ -344,6 +337,7 @@ class AutoresponderCog(commands.Cog):
 
                     if response:
                         try:
+                            print(f"Sending autoresponder '{ar_name}' in guild {guild_id} to {message.author.name}\nResponse:{response}\nEmbed: {response.get('embed')}\nView: {response.get('view')}")
                             sent_message = await message.channel.send(
                                 content=response["text"],
                                 embed=response.get("embed"),
@@ -379,7 +373,7 @@ class AutoresponderCog(commands.Cog):
         if reaction.message.id in self.ar_messages:
             ar_info = self.ar_messages[reaction.message.id]
             guild_id = str(reaction.message.guild.id)
-            ar_data = get_autoresponder(guild_id, ar_info['name'], 'en')  # Use 'en' for info as default
+            ar_data = get_autoresponder(guild_id, ar_info['name'], 'en')
             if str(reaction.emoji) == "🗑️" and await self.check_permissions(user, guild_id, 'delete', ar_data):
                 await reaction.message.delete()
                 del self.ar_messages[reaction.message.id]
@@ -442,10 +436,9 @@ class AutoresponderCog(commands.Cog):
 
     @autoresponder.command(name="create")
     async def ar_create(self, ctx, name: str):
-        """Create an autoresponder interactively"""
+        """create an autoresponder interactively"""
         guild_id = str(ctx.guild.id)
         lang = cfg.get_user_config(ctx.author.id, "language") or "en"
-        server_config = cfg.get_guild_config(guild_id)
         if not await self.check_permissions(ctx.author, guild_id, 'edit'):
             await ctx.send(localization.get("config", "ar.no_permission", lang=lang))
             return
@@ -453,7 +446,6 @@ class AutoresponderCog(commands.Cog):
             await ctx.send(localization.get("config", "ar.already_exists", lang=lang, name=name))
             return
 
-        # Prompt for trigger
         await ctx.send(localization.get("config", "ar.create_prompt_trigger", lang=lang, name=name))
         try:
             trigger_msg = await self.bot.wait_for('message', check=lambda m: m.author.id == ctx.author.id and m.channel.id == ctx.channel.id, timeout=60)
@@ -465,7 +457,6 @@ class AutoresponderCog(commands.Cog):
             await ctx.send(localization.get("config", "ar.timeout", lang=lang))
             return
 
-        # Prompt for response
         await ctx.send(localization.get("config", "ar.create_prompt_response", lang=lang, name=name))
         try:
             response_msg = await self.bot.wait_for('message', check=lambda m: m.author.id == ctx.author.id and m.channel.id == ctx.channel.id, timeout=60)
@@ -478,7 +469,6 @@ class AutoresponderCog(commands.Cog):
             await ctx.send(localization.get("config", "ar.timeout", lang=lang))
             return
 
-        # Prompt for arguments
         await ctx.send(localization.get("config", "ar.create_prompt_arguments", lang=lang, name=name))
         try:
             args_msg = await self.bot.wait_for('message', check=lambda m: m.author.id == ctx.author.id and m.channel.id == ctx.channel.id, timeout=60)
@@ -490,13 +480,12 @@ class AutoresponderCog(commands.Cog):
             await ctx.send(localization.get("config", "ar.timeout", lang=lang))
             return
 
-        # Prompt for language
         await ctx.send(localization.get("config", "ar.create_prompt_language", lang=lang, name=name))
         try:
             lang_msg = await self.bot.wait_for('message', check=lambda m: m.author.id == ctx.author.id and m.channel.id == ctx.channel.id, timeout=60)
             language = lang_msg.content.lower()
         except asyncio.TimeoutError:
-            language = server_config.get('language', 'en')
+            language = cfg.get_guild_config(guild_id, 'language')
 
         create_autoresponder(
             guild_id, name, trigger, response, ctx.author.id, language,
@@ -531,31 +520,29 @@ class AutoresponderCog(commands.Cog):
             value=arguments,
             inline=True
         )
-        await ctx.send(embed=embed, view=AutoresponderEditView(self.bot, get_autoresponder(guild_id, name, language), ctx.author.id, guild_id, language))
+        await ctx.send(embed=embed, view=edit_view(self.bot, get_autoresponder(guild_id, name, language), ctx.author.id, guild_id, language))
 
     @autoresponder.command(name="edit")
     async def ar_edit(self, ctx, name: str):
-        """Edit an autoresponder interactively"""
+        """edit an autoresponder interactively"""
         guild_id = str(ctx.guild.id)
-        lang = cfg.get_user_config(ctx.author.id, "language") or "en"
-        server_config = cfg.get_guild_config(guild_id)
-        language = server_config.get('language', 'en')
-        ar_data = get_autoresponder(guild_id, name, language) or get_autoresponder(guild_id, name, 'en')
+        lang = cfg.get_language(ctx.author.id, guild_id) or "en"
+        ar_data = get_autoresponder(guild_id, name, lang) or get_autoresponder(guild_id, name, 'en')
         if not ar_data:
             await ctx.send(localization.get("config", "ar.not_found", lang=lang, name=name))
             return
         if not await self.check_permissions(ctx.author, guild_id, 'edit', ar_data):
             if not ar_data.get('edit_permissions') or 'edit_non_default' not in ar_data.get('edit_permissions', '').split(','):
-                if ar_data['language'] != server_config.get('language', 'en'):
+                if ar_data['language'] != cfg.get_guild_config(guild_id, 'language'):
                     await ctx.send(localization.get("config", "ar.no_edit_permission", lang=lang, action="edit non-default language"))
                     return
             await ctx.send(localization.get("config", "ar.no_permission", lang=lang))
             return
-        await ctx.send(embed=await AutoresponderEditView(self.bot, ar_data, ctx.author.id, guild_id, ar_data['language']).create_edit_embed(ctx.author), view=AutoresponderEditView(self.bot, ar_data, ctx.author.id, guild_id, ar_data['language']))
+        await ctx.send(embed=await edit_view(self.bot, ar_data, ctx.author.id, guild_id, ar_data['language']).create_edit_embed(ctx.author), view=edit_view(self.bot, ar_data, ctx.author.id, guild_id, ar_data['language']))
 
     @autoresponder.command(name="delete")
     async def ar_delete(self, ctx, name: str):
-        """Delete an autoresponder"""
+        """delete an autoresponder"""
         guild_id = str(ctx.guild.id)
         lang = cfg.get_user_config(ctx.author.id, "language") or "en"
         ar_data = get_autoresponder(guild_id, name, 'en')  # Check permissions with 'en' version
@@ -603,17 +590,13 @@ class AutoresponderCog(commands.Cog):
     async def ar_error(self, ctx, error):
         lang = cfg.get_user_config(ctx.author.id, "language") or "en"
         if isinstance(error, commands.MissingRequiredArgument):
-            logger.error(f"Missing argument in autoresponder command: {error.param.name} for {ctx.command.name} in guild {ctx.guild.id}")
             await ctx.send(localization.get("config", "ar.argument_missing", lang=lang, arg=error.param.name))
         elif isinstance(error, commands.BadArgument):
-            logger.error(f"Invalid argument in autoresponder command: {error}")
             await ctx.send(localization.get("config", "ar.invalid_name", lang=lang))
         elif isinstance(error, commands.MissingPermissions):
-            logger.error(f"User {ctx.author.id} tried to use autoresponder command without permission in guild {ctx.guild.id}")
             await ctx.send(localization.get("config", "ar.no_permission", lang=lang))
         elif isinstance(error, commands.CommandInvokeError):
-            logger.error(f"Error in autoresponder command: {error.original}")
-            await ctx.send(localization.get("config", "ar.failure", lang=lang))
+            await ctx.send(f"{localization.get("config", "ar.failure", lang=lang)}\nError:\n```python\n{error.original}\n```")
 
 async def setup(bot):
     await bot.add_cog(AutoresponderCog(bot))
